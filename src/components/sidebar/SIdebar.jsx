@@ -5,6 +5,7 @@ import { Box, Button, useMediaQuery } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import ReviewsIcon from '@mui/icons-material/Reviews';
 import { gsap } from 'gsap';
 
 // Styled Components
@@ -194,6 +195,16 @@ const Sidebar = () => {
       >
         <AccountCircleIcon fontSize="inherit" />
         <span>Account</span>
+      </SidebarButton>
+
+      <SidebarButton
+        component={NavLink}
+        to="/app/chatai"
+        className={({ isActive }) => (isActive ? 'active' : '')}
+        aria-label="Go to account page"
+      >
+        <ReviewsIcon fontSize="inherit" />
+        <span>Chat</span>
       </SidebarButton>
 
       <SidebarButton
