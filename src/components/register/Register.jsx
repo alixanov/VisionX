@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-import { Box, Card, TextField, Button, Typography } from '@mui/material';
+import { Box, Card, TextField, Button, Typography, CircularProgress } from '@mui/material';
 import Tilt from 'react-parallax-tilt';
 import { gsap } from 'gsap';
 
@@ -110,14 +110,11 @@ const ActionLink = styled(Typography)({
 const StyledTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
     '&.Mui-focused fieldset': {
-      border: 'none', // Единый бордер
-      borderRadius: '8px', // Радиус при фокусе
+      border: 'none',
+      borderRadius: '8px',
     },
   },
 });
-
-
-
 
 const StyledButton = styled(Button)({
   '&:focus': {
@@ -128,9 +125,16 @@ const StyledButton = styled(Button)({
 
 const Register = () => {
   const [isLoginMode, setIsLoginMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    username: '',
+    password: ''
+  });
   const navigate = useNavigate();
 
-  // Мозаика фона
   useEffect(() => {
     const cells = [];
     const cellCount = 50;
@@ -180,7 +184,6 @@ const Register = () => {
     return () => container.remove();
   }, []);
 
-  // Анимация облаков
   useEffect(() => {
     gsap.to('.cloud-1', { y: -20, opacity: 1, duration: 2, repeat: -1, yoyo: true });
     gsap.to('.cloud-2', { y: -15, opacity: 1, duration: 2.5, repeat: -1, yoyo: true, delay: 0.5 });
@@ -188,76 +191,116 @@ const Register = () => {
     gsap.to('.cloud-4', { y: -25, opacity: 1, duration: 2.2, repeat: -1, yoyo: true, delay: 0.8 });
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/main');
+    setIsLoading(true);
+
+    try {
+      // Simulate API call for registration
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      if (!isLoginMode) {
+        // After successful registration, switch to login mode
+        setIsLoginMode(true);
+        // Clear password field only
+        setFormData(prev => ({ ...prev, password: '' }));
+      } else {
+        // After successful login, navigate to main page
+        navigate('/app/main');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <PageContainer id="page-container">
-      {/* Заголовок */}
       <Tilt>
         <BannerBox>
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            Connect. Think. Be Heard. Welcome to VisionX.
+            {isLoginMode ? 'Welcome Back to VisionX' : 'Connect. Think. Be Heard. Welcome to VisionX.'}
           </Typography>
         </BannerBox>
       </Tilt>
 
-      {/* Форма */}
       <FormCard>
         <Typography variant="h6" align="center" gutterBottom>
           {isLoginMode ? 'Login' : 'Register'}
         </Typography>
         <form onSubmit={handleSubmit}>
-          {!isLoginMode &&
+          {!isLoginMode && (
             <>
               <StyledTextField
                 fullWidth
+                name="firstName"
                 label="First Name"
                 variant="outlined"
                 margin="dense"
                 required
+                value={formData.firstName}
+                onChange={handleInputChange}
                 InputLabelProps={{ style: { color: '#fff' } }}
                 InputProps={{ style: { color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)' } }}
               />
               <StyledTextField
                 fullWidth
+                name="lastName"
                 label="Last Name"
                 variant="outlined"
                 margin="dense"
                 required
+                value={formData.lastName}
+                onChange={handleInputChange}
                 InputLabelProps={{ style: { color: '#fff' } }}
                 InputProps={{ style: { color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)' } }}
               />
             </>
-          }
+          )}
           <StyledTextField
             fullWidth
+            name="email"
             label="Email"
             type="email"
             variant="outlined"
             margin="dense"
             required
+            value={formData.email}
+            onChange={handleInputChange}
             InputLabelProps={{ style: { color: '#fff' } }}
             InputProps={{ style: { color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)' } }}
           />
           <StyledTextField
             fullWidth
+            name="username"
             label="Username"
             variant="outlined"
             margin="dense"
             required
+            value={formData.username}
+            onChange={handleInputChange}
             InputLabelProps={{ style: { color: '#fff' } }}
             InputProps={{ style: { color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)' } }}
           />
           <StyledTextField
             fullWidth
+            name="password"
             label="Password"
             type="password"
             variant="outlined"
             margin="dense"
             required
+            value={formData.password}
+            onChange={handleInputChange}
             InputLabelProps={{ style: { color: '#fff' } }}
             InputProps={{ style: { color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)' } }}
           />
@@ -265,6 +308,7 @@ const Register = () => {
             type="submit"
             fullWidth
             variant="contained"
+            disabled={isLoading}
             sx={{
               mt: 2,
               background: 'linear-gradient(45deg, #00f260, #0575e6)',
@@ -273,41 +317,57 @@ const Register = () => {
               '&:hover': { transform: 'scale(1.05)' },
             }}
           >
-            {isLoginMode ? 'Login' : 'Create Your Identity'}
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : isLoginMode ? (
+              'Login'
+            ) : (
+              'Create Your Identity'
+            )}
           </StyledButton>
         </form>
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <ActionLink
-            onClick={() => setIsLoginMode(!isLoginMode)}
+            onClick={() => {
+              setIsLoginMode(!isLoginMode);
+              // Clear form when switching modes
+              setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                username: '',
+                password: ''
+              });
+            }}
             tabIndex="0"
           >
-            {isLoginMode ? 'Register' : 'Login'}
+            {isLoginMode ? 'Need an account? Register' : 'Already have an account? Login'}
           </ActionLink>
-          <ActionLink
-            component={Link}
-            to="/app/main"
-            tabIndex="0"
-          >
-            Start Exploring
-          </ActionLink>
+          {isLoginMode && (
+            <ActionLink
+              component={Link}
+              to="/app/main"
+              tabIndex="0"
+            >
+              Start Exploring
+            </ActionLink>
+          )}
         </Box>
       </FormCard>
 
-      {/* Облака-баннеры */}
       <CloudBanner className="cloud-1" sx={{ top: '20%', left: '10%' }}>
-        💡 Более 2M+ мыслей уже здесь.
+        💡 {isLoginMode ? 'Welcome back!' : 'Join our community of thinkers'}
       </CloudBanner>
       <CloudBanner className="cloud-2" sx={{ top: '40%', right: '10%' }}>
-        🚀 Объединяйся с ИИ для роста идей.
+        🚀 {isLoginMode ? 'Continue your journey' : 'Start your journey today'}
       </CloudBanner>
       <CloudBanner className="cloud-3" sx={{ top: '60%', left: '15%' }}>
-        🧠 ИИ = Социальный интеллект.
+        🧠 {isLoginMode ? 'Your ideas are waiting' : 'Unlock your potential'}
       </CloudBanner>
       <CloudBanner className="cloud-4" sx={{ top: '30%', right: '15%' }}>
-        🌟 Создай будущее с VisionX.
+        🌟 {isLoginMode ? 'Great to see you again' : 'Create your future'}
       </CloudBanner>
 
-      {/* Футуристичная навигация */}
       <Box sx={{ position: 'fixed', bottom: '20px', display: 'flex', gap: '16px' }}>
         <NavIcon title="Chat" tabIndex="0">💬</NavIcon>
         <NavIcon title="Channel" tabIndex="0">📡</NavIcon>
@@ -318,7 +378,6 @@ const Register = () => {
   );
 };
 
-// CSS для мозаики
 const styles = document.createElement('style');
 styles.innerHTML = `
   .mosaic {
@@ -336,13 +395,11 @@ styles.innerHTML = `
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
   
-  /* Убираем стандартный outline и заменяем на белый */
   *:focus {
     outline: none !important;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5) !important;
   }
   
-  /* Для кнопок и интерактивных элементов */
   button:focus, a:focus, [tabindex="0"]:focus {
     outline: none !important;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8) !important;
