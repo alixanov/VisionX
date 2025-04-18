@@ -3,8 +3,7 @@
 
 /* Apply Orbitron to specific elements */
 body {
-font-family: 'Space Grotesk', sans-serif;
-}
+font-family: 'Space Grotesk', sans-serif;}
 
 /* For MUI components that use Typography */
 .MuiTypography-root {

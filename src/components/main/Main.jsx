@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 const MainContainer = styled(Box)(({ theme }) => ({
   width: '100%',
   color: '#fff',
-  fontFamily: 'Inter, sans-serif',
+  fontFamily: 'Space Grotesk',
   position: 'relative',
   overflow: 'hidden',
   marginRight: '220px',
