@@ -285,7 +285,7 @@ const Register = () => {
           </ActionLink>
           <ActionLink
             component={Link}
-            to="/app"
+            to="/app/main"
             tabIndex="0"
           >
             Start Exploring

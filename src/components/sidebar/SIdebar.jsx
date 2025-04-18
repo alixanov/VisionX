@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { Box, Button, useMediaQuery } from '@mui/material';
-import gsap from 'gsap';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { gsap } from 'gsap';
 
 // Styled Components
 const SidebarContainer = styled(Box)(({ theme }) => ({
@@ -26,6 +26,18 @@ const SidebarContainer = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   zIndex: 1000,
   transition: 'all 0.3s ease',
+  opacity: 0,
+  transform: 'translateX(20px)',
+
+  [theme.breakpoints.down('lg')]: {
+    width: '200px',
+    padding: '15px 8px',
+  },
+
+  [theme.breakpoints.down('md')]: {
+    width: '180px',
+    padding: '12px 8px',
+  },
 
   [theme.breakpoints.down('sm')]: {
     width: '100%',
@@ -37,15 +49,25 @@ const SidebarContainer = styled(Box)(({ theme }) => ({
     left: 0,
     justifyContent: 'space-around',
     alignItems: 'center',
+    background: 'white',
     borderTop: '2px solid #00f260',
     borderLeft: 'none',
     padding: '5px 10px',
+    gap: '12px',
+    transform: 'translateY(20px)',
+    boxShadow: '0 -2px 10px rgba(0, 242, 96, 0.15)',
+  },
+
+  [theme.breakpoints.down('xs')]: {
+    height: '60px',
+    padding: '5px 8px',
+    gap: '8px',
   },
 }));
 
 const SidebarButton = styled(Button)(({ theme }) => ({
   width: '90%',
-  marginBottom: '12px',
+  marginBottom: '16px',
   textTransform: 'none',
   color: '#11172b',
   background: 'white',
@@ -54,9 +76,14 @@ const SidebarButton = styled(Button)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'flex-start',
   fontWeight: 'bold',
+  fontSize: '1rem',
   transition: 'all 0.3s ease',
+  willChange: 'transform, background, box-shadow',
+
   '& svg': {
     marginRight: '8px',
+    fontSize: '1.5rem',
+    color: '#11172b',
   },
 
   '&:hover, &.active': {
@@ -64,72 +91,86 @@ const SidebarButton = styled(Button)(({ theme }) => ({
     boxShadow: '0 0 15px rgba(0, 242, 96, 0.5)',
     transform: 'scale(1.05)',
     color: '#fff',
+
+    '& svg': {
+      color: '#fff',
+    },
+  },
+
+  [theme.breakpoints.down('lg')]: {
+    padding: '8px 14px',
+    fontSize: '0.95rem',
+
+    '& svg': {
+      fontSize: '1.4rem',
+    },
+  },
+
+  [theme.breakpoints.down('md')]: {
+    padding: '7px 12px',
+    fontSize: '0.9rem',
+
+    '& svg': {
+      fontSize: '1.3rem',
+    },
   },
 
   [theme.breakpoints.down('sm')]: {
     width: 'auto',
     height: '50px',
+    minWidth: '50px',
     marginBottom: 0,
-    padding: '8px 12px',
+    padding: '6px',
     flexDirection: 'column',
-    fontSize: '0.7rem',
+    fontSize: '0px', // Скрываем текст
+    background: 'transparent',
+
     '& svg': {
       marginRight: 0,
-      marginBottom: '4px',
-      fontSize: '1.2rem',
+      marginBottom: '0px',
+      fontSize: '1.6rem',
+    },
+
+    '&:hover, &.active': {
+      background: 'transparent',
+      boxShadow: 'none',
+      transform: 'scale(1.1)',
+
+      '& svg': {
+        color: '#00f260',
+      },
+    },
+  },
+
+  [theme.breakpoints.down('xs')]: {
+    height: '45px',
+    minWidth: '45px',
+    padding: '5px',
+
+    '& svg': {
+      fontSize: '1.4rem',
     },
   },
 }));
 
-// GSAP Animation
+// Sidebar Component
 const Sidebar = () => {
   const sidebarRef = useRef(null);
   const isMobile = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
-    if (!sidebarRef.current) return;
-
-    const cells = [];
-    const cellCount = isMobile ? 15 : 30;
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.width = '100%';
-    container.style.height = '100%';
-    container.style.pointerEvents = 'none';
-    container.style.zIndex = '0';
-    container.style.overflow = 'hidden';
-    sidebarRef.current.appendChild(container);
-
-    for (let i = 0; i < cellCount; i++) {
-      const cell = document.createElement('div');
-      cell.style.position = 'absolute';
-      cell.style.width = `${Math.random() * (isMobile ? 10 : 15) + 5}px`;
-      cell.style.height = cell.style.width;
-      cell.style.left = `${Math.random() * 100}%`;
-      cell.style.top = `${Math.random() * 100}%`;
-      cell.style.background = 'linear-gradient(45deg, #00f260, #0575e6)';
-      cell.style.opacity = '0.3';
-      cell.style.borderRadius = '4px';
-      cell.style.transition = 'all 0.3s ease';
-      container.appendChild(cell);
-      cells.push(cell);
-    }
-
-    const animation = gsap.to(cells, {
-      x: () => Math.random() * (isMobile ? 20 : 50) - (isMobile ? 10 : 25),
-      y: () => Math.random() * (isMobile ? 20 : 50) - (isMobile ? 10 : 25),
-      opacity: () => Math.random() * 0.6 + 0.2,
-      duration: 3,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-      stagger: 0.1,
-    });
-
-    return () => {
-      animation.kill();
-      container.remove();
-    };
+    gsap.fromTo(
+      sidebarRef.current,
+      { opacity: 0, x: isMobile ? 0 : 20, y: isMobile ? 20 : 0 },
+      {
+        opacity: 1,
+        x: 0,
+        y: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        delay: 0.3
+      }
+    );
   }, [isMobile]);
 
   return (
@@ -137,28 +178,31 @@ const Sidebar = () => {
       <SidebarButton
         component={NavLink}
         to="/app/main"
-        activeClassName="active"
-        exact
+        className={({ isActive }) => (isActive ? 'active' : '')}
+        end
+        aria-label="Go to main page"
       >
-        <HomeIcon fontSize="medium" />
+        <HomeIcon fontSize="inherit" />
         <span>Start</span>
       </SidebarButton>
 
       <SidebarButton
         component={NavLink}
         to="/app/account"
-        activeClassName="active"
+        className={({ isActive }) => (isActive ? 'active' : '')}
+        aria-label="Go to account page"
       >
-        <AccountCircleIcon fontSize="medium" />
+        <AccountCircleIcon fontSize="inherit" />
         <span>Account</span>
       </SidebarButton>
 
       <SidebarButton
         component={NavLink}
         to="/"
-        activeClassName="active"
+        className={({ isActive }) => (isActive ? 'active' : '')}
+        aria-label="Go to register page"
       >
-        <PersonAddIcon fontSize="medium" />
+        <PersonAddIcon fontSize="inherit" />
         <span>Register</span>
       </SidebarButton>
     </SidebarContainer>
