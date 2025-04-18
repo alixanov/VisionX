@@ -387,7 +387,7 @@ const Main = () => {
         <HeroSubtitle variant="h5">
           Explore the technologies of the future. Connect with the VisionX community.
         </HeroSubtitle>
-        <JoinButton component={Link} to="/register">
+        <JoinButton component={Link} to="/">
           Join Now
         </JoinButton>
         <CloudBanner className="cloud-1" sx={{ top: '20%', left: '10%' }}>
