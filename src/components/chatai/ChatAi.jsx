@@ -9,11 +9,9 @@ import {
   Avatar,
   Chip,
   Tooltip,
-  Button,
   CircularProgress,
   useMediaQuery,
   useTheme,
-  Fade,
   Menu,
   MenuItem,
   Divider,
@@ -34,16 +32,16 @@ import { gsap } from 'gsap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// Styled Components (unchanged from your code)
 const ChatContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: '95vh',
+  height: '95vh', // По умолчанию для десктопа
   width: '100%',
   position: 'relative',
   overflow: 'hidden',
   fontFamily: 'Inter, sans-serif',
   color: '#fff',
+
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -57,6 +55,7 @@ const ChatContainer = styled(Box)(({ theme }) => ({
     pointerEvents: 'none',
   },
 }));
+
 
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -154,23 +153,25 @@ const MessagesArea = styled(Box)(({ theme }) => ({
   },
 }));
 
-const MessageBubble = styled(Paper)(({ isUser, isPinned, theme }) => ({
+const MessageBubble = styled(Paper, {
+  shouldForwardProp: (prop) => !['isuser', 'ispinned'].includes(prop),
+})(({ isuser, ispinned, theme }) => ({
   padding: '16px',
   maxWidth: '80%',
   width: 'fit-content',
-  alignSelf: isUser ? 'flex-end' : 'flex-start',
-  background: isUser ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+  alignSelf: isuser ? 'flex-end' : 'flex-start',
+  background: isuser ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.9)',
   backdropFilter: 'blur(10px)',
-  borderRadius: isUser ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
-  boxShadow: isPinned
-    ? `0 4px 20px ${isUser ? 'rgba(0, 242, 96, 0.3)' : 'rgba(161, 0, 255, 0.3)'}, 0 0 0 1px ${isUser ? 'rgba(0, 242, 96, 0.5)' : 'rgba(161, 0, 255, 0.5)'
+  borderRadius: isuser ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
+  boxShadow: ispinned
+    ? `0 4px 20px ${isuser ? 'rgba(0, 242, 96, 0.3)' : 'rgba(161, 0, 255, 0.3)'}, 0 0 0 1px ${isuser ? 'rgba(0, 242, 96, 0.5)' : 'rgba(161, 0, 255, 0.5)'
     }`
     : `0 4px 20px rgba(0, 0, 0, 0.1)`,
-  border: isPinned ? `1px solid ${isUser ? '#00F260' : '#A100FF'}` : '1px solid rgba(0, 0, 0, 0.1)',
+  border: ispinned ? `1px solid ${isuser ? '#00F260' : '#A100FF'}` : '1px solid rgba(0, 0, 0, 0.1)',
   position: 'relative',
   transition: 'all 0.3s ease',
   '&:hover': {
-    boxShadow: `0 6px 24px ${isUser ? 'rgba(0, 242, 96, 0.25)' : 'rgba(161, 0, 255, 0.25)'}`,
+    boxShadow: `0 6px 24px ${isuser ? 'rgba(0, 242, 96, 0.25)' : 'rgba(161, 0, 255, 0.25)'}`,
   },
   '&:hover .message-actions': {
     opacity: 1,
@@ -227,24 +228,28 @@ const MessageHeader = styled(Box)(({ theme }) => ({
   },
 }));
 
-const MessageAvatar = styled(Avatar)(({ isAi, theme }) => ({
+const MessageAvatar = styled(Avatar, {
+  shouldForwardProp: (prop) => prop !== 'isai',
+})(({ isai, theme }) => ({
   width: 32,
   height: 32,
-  background: isAi
+  background: isai
     ? 'linear-gradient(135deg, #A100FF, #0575E6)'
     : 'linear-gradient(135deg, #00F260, #0575E6)',
-  boxShadow: isAi ? '0 0 15px rgba(161, 0, 255, 0.5)' : '0 0 15px rgba(0, 242, 96, 0.5)',
+  boxShadow: isai ? '0 0 15px rgba(161, 0, 255, 0.5)' : '0 0 15px rgba(0, 242, 96, 0.5)',
   [theme.breakpoints.down('sm')]: {
     width: 28,
     height: 28,
   },
 }));
 
-const MessageName = styled(Typography)(({ isAi, theme }) => ({
+const MessageName = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== 'isai',
+})(({ isai, theme }) => ({
   fontWeight: 600,
   fontSize: '0.9rem',
-  color: isAi ? '#A100FF' : '#00F260',
-  textShadow: isAi ? '0 0 10px rgba(161, 0, 255, 0.5)' : '0 0 10px rgba(0, 242, 96, 0.5)',
+  color: isai ? '#A100FF' : '#00F260',
+  textShadow: isai ? '0 0 10px rgba(161, 0, 255, 0.5)' : '0 0 10px rgba(0, 242, 96, 0.5)',
   [theme.breakpoints.down('sm')]: {
     fontSize: '0.8rem',
   },
@@ -252,7 +257,7 @@ const MessageName = styled(Typography)(({ isAi, theme }) => ({
 
 const MessageTime = styled(Typography)(({ theme }) => ({
   fontSize: '0.7rem',
-  color: 'rgba(0, 0, 0, 0.6)', // Darker text for better visibility
+  color: 'rgba(0, 0, 0, 0.6)',
   [theme.breakpoints.down('sm')]: {
     fontSize: '0.65rem',
   },
@@ -366,13 +371,15 @@ const SendButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const ModeButton = styled(IconButton)(({ active, theme }) => ({
+const ModeButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== 'isActive',
+})(({ isActive, theme }) => ({
   width: '36px',
   height: '36px',
-  background: active ? 'linear-gradient(135deg, #A100FF, #0575E6)' : 'rgba(16, 18, 27, 0.6)',
+  background: isActive ? 'linear-gradient(135deg, #A100FF, #0575E6)' : 'rgba(16, 18, 27, 0.6)',
   color: '#fff',
   borderRadius: '50%',
-  boxShadow: active ? '0 0 15px rgba(161, 0, 255, 0.5)' : 'none',
+  boxShadow: isActive ? '0 0 15px rgba(161, 0, 255, 0.5)' : 'none',
   transition: 'all 0.3s ease',
   '&:hover': {
     background: 'linear-gradient(135deg, #A100FF, #0575E6)',
@@ -411,7 +418,6 @@ const AnimatedBubble = styled(Box)(({ size, color, theme }) => ({
   pointerEvents: 'none',
 }));
 
-// Error message for API failures
 const ErrorMessage = styled(Typography)(({ theme }) => ({
   fontSize: '0.9rem',
   color: '#ff4d4d',
@@ -422,19 +428,17 @@ const ErrorMessage = styled(Typography)(({ theme }) => ({
   },
 }));
 
-// Initial messages
 const initialMessages = [
   {
     id: 1,
     text: "Welcome to VisionX Assistant! How can I help you today with your projects or ideas?",
     isUser: false,
     timestamp: new Date(Date.now() - 600000).toISOString(),
-    tags: ["Greeting"],
+    tags: ['Greeting'],
     isPinned: false,
   },
 ];
 
-// Main component
 const ChatAi = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -450,18 +454,16 @@ const ChatAi = () => {
   const [error, setError] = useState('');
   const open = Boolean(anchorEl);
 
-  // Retrieve user data
   let userData;
   try {
     const storedData = localStorage.getItem('userData');
-    console.log('Stored userData in ChatAi:', storedData); // Debugging
+    console.log('Stored userData in ChatAi:', storedData);
     userData = storedData ? JSON.parse(storedData) : {};
   } catch (err) {
     console.error('Error parsing userData:', err);
     userData = {};
   }
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!userData.email && !userData.username) {
       console.warn('No user data found, redirecting to /app/register');
@@ -469,12 +471,10 @@ const ChatAi = () => {
     }
   }, [navigate]);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Bubble animations
   useEffect(() => {
     if (bubbleRefs.current.length > 0) {
       bubbleRefs.current.forEach((bubble) => {
@@ -493,7 +493,6 @@ const ChatAi = () => {
     }
   }, []);
 
-  // Menu handlers
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -502,10 +501,9 @@ const ChatAi = () => {
     setAnchorEl(null);
   };
 
-  // Input handlers
   const handleInputChange = (e) => {
     setInputText(e.target.value);
-    setError(''); // Clear error on input
+    setError('');
   };
 
   const handleKeyPress = (e) => {
@@ -515,7 +513,6 @@ const ChatAi = () => {
     }
   };
 
-  // Message actions
   const handlePin = (id) => {
     setMessages((prev) =>
       prev.map((msg) => (msg.id === id ? { ...msg, isPinned: !msg.isPinned } : msg))
@@ -530,12 +527,10 @@ const ChatAi = () => {
     setMessages((prev) => prev.filter((msg) => msg.id !== id));
   };
 
-  // Mode change
   const handleChangeMode = (mode) => {
     setActiveMode(mode);
   };
 
-  // Clear chat
   const handleClearChat = () => {
     setMessages([
       {
@@ -550,12 +545,11 @@ const ChatAi = () => {
     handleMenuClose();
   };
 
-  // Send message and get AI response
   const handleSendMessage = async () => {
     if (inputText.trim() === '') return;
 
     const newUserMessage = {
-      id: messages.length + 1,
+      id: Date.now(), // Используем timestamp для уникального ID
       text: inputText,
       isUser: true,
       timestamp: new Date().toISOString(),
@@ -567,27 +561,37 @@ const ChatAi = () => {
     setIsTyping(true);
     setError('');
 
-    try {
-      // Mode-specific system prompt
-      const systemPrompts = {
-        assistant:
-          'You are a helpful assistant for VisionX, a platform for tech enthusiasts. Provide clear, concise, and friendly answers to general questions, focusing on AI, tech, and innovation.',
-        coder:
-          'You are a coding expert for VisionX. Provide detailed, accurate programming advice, including code snippets when relevant. Focus on modern frameworks like React, Node.js, and best practices.',
-        designer:
-          'You are a UI/UX design expert for VisionX. Offer creative design suggestions, focusing on modern trends like dark mode, glass-morphism, and responsive layouts. Provide actionable advice.',
-        innovator:
-          'You are an innovation consultant for VisionX. Think outside the box and suggest bold, creative ideas to revolutionize tech projects or user experiences.',
-      };
+    const systemPrompts = {
+      assistant:
+        'You are a helpful assistant for VisionX, a platform for tech enthusiasts. Provide clear, concise, and friendly answers to general questions, focusing on AI, tech, and innovation.',
+      coder:
+        'You are a coding expert for VisionX. Provide detailed, accurate programming advice, including code snippets when relevant. Focus on modern frameworks like React, Node.js, and best practices.',
+      designer:
+        'You are a UI/UX design expert for VisionX. Offer creative design suggestions, focusing on modern trends like dark mode, glass-morphism, and responsive layouts. Provide actionable advice.',
+      innovator:
+        'You are an innovation consultant for VisionX. Think outside the box and suggest bold, creative ideas to revolutionize tech projects or user experiences.',
+    };
 
-      const response = await axios.post('http://192.168.1.7:8080/api/chat', {
-        message: inputText,
-        mode: activeMode,
-        systemPrompt: systemPrompts[activeMode],
-      });
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/chat',
+        {
+          message: inputText,
+          mode: activeMode,
+          systemPrompt: systemPrompts[activeMode],
+        },
+        {
+          timeout: 30000,
+          retries: 3,
+          retryDelay: 1000,
+          onRetry: (retryCount) => {
+            console.log(`Повторная попытка ${retryCount} из 3...`);
+          }
+        }
+      );
 
       const aiResponse = {
-        id: messages.length + 2,
+        id: Date.now() + 1, // Уникальный ID для ответа
         text: response.data.message,
         isUser: false,
         timestamp: new Date().toISOString(),
@@ -597,14 +601,30 @@ const ChatAi = () => {
 
       setMessages((prev) => [...prev, aiResponse]);
     } catch (err) {
-      console.error('Error fetching AI response:', err);
-      setError('Failed to get AI response. Please try again.');
+      console.error('Ошибка получения ответа AI:', err);
+
+      // Более информативное сообщение об ошибке
+      const errorMessage = err.response?.data?.error ||
+        (err.code === 'ECONNABORTED' ?
+          'Время ожидания ответа истекло. Повторите попытку.' :
+          'Не удалось получить ответ AI. Пожалуйста, попробуйте еще раз.');
+
+      setError(errorMessage);
+
+      // Добавляем сообщение об ошибке в чат
+      setMessages((prev) => [...prev, {
+        id: Date.now() + 1,
+        text: `⚠️ ${errorMessage}`,
+        isUser: false,
+        timestamp: new Date().toISOString(),
+        tags: ['Error'],
+        isPinned: false,
+      }]);
     } finally {
       setIsTyping(false);
     }
   };
 
-  // Random tags for AI responses
   const getRandomTags = () => {
     const allTags = ['AI', 'Design', 'Code', 'UX/UI', 'Innovation', 'Tech', 'Advice', 'Explanation'];
     const numTags = Math.floor(Math.random() * 2) + 1;
@@ -612,7 +632,6 @@ const ChatAi = () => {
     return shuffled.slice(0, numTags);
   };
 
-  // Format timestamp
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -620,7 +639,6 @@ const ChatAi = () => {
 
   return (
     <ChatContainer>
-      {/* Background animated bubbles */}
       <AnimatedBubble
         ref={(el) => (bubbleRefs.current[0] = el)}
         size="300px"
@@ -640,7 +658,6 @@ const ChatAi = () => {
         sx={{ top: '40%', left: '15%' }}
       />
 
-      {/* Header */}
       <Header>
         <Logo variant="h1">
           <ScienceIcon sx={{ fontSize: 28 }} /> VisionX Assistant
@@ -691,13 +708,12 @@ const ChatAi = () => {
         </Box>
       </Header>
 
-      {/* Messages area */}
       <MessagesArea ref={messagesAreaRef}>
         {messages.map((message) => (
           <MessageBubble
             key={message.id}
-            isUser={message.isUser}
-            isPinned={message.isPinned}
+            isuser={message.isUser}
+            ispinned={message.isPinned}
             elevation={message.isPinned ? 8 : 3}
           >
             <MessageActions className="message-actions">
@@ -718,11 +734,11 @@ const ChatAi = () => {
               </Tooltip>
             </MessageActions>
             <MessageHeader>
-              <MessageAvatar isAi={!message.isUser}>
+              <MessageAvatar isai={!message.isUser}>
                 {message.isUser ? (userData.firstName ? userData.firstName.charAt(0).toUpperCase() : 'U') : 'AI'}
               </MessageAvatar>
               <Box>
-                <MessageName isAi={!message.isUser}>
+                <MessageName isai={!message.isUser}>
                   {message.isUser ? (userData.firstName || 'You') : 'VisionX AI'}
                 </MessageName>
                 <MessageTime>{formatTime(message.timestamp)}</MessageTime>
@@ -741,11 +757,11 @@ const ChatAi = () => {
           </MessageBubble>
         ))}
         {isTyping && (
-          <MessageBubble isUser={false}>
+          <MessageBubble isuser={false} ispinned={false}>
             <MessageHeader>
-              <MessageAvatar isAi>AI</MessageAvatar>
+              <MessageAvatar isai>AI</MessageAvatar>
               <Box>
-                <MessageName isAi>VisionX AI</MessageName>
+                <MessageName isai>VisionX AI</MessageName>
                 <MessageTime>{formatTime(new Date().toISOString())}</MessageTime>
               </Box>
             </MessageHeader>
@@ -759,21 +775,20 @@ const ChatAi = () => {
         <div ref={messagesEndRef} />
       </MessagesArea>
 
-      {/* Input area */}
       <InputArea>
         <ModeSelector>
           <Tooltip title="Assistant Mode">
-            <ModeButton active={activeMode === 'assistant'} onClick={() => handleChangeMode('assistant')}>
+            <ModeButton isActive={activeMode === 'assistant'} onClick={() => handleChangeMode('assistant')}>
               <EmojiObjectsIcon fontSize={isMobile ? 'small' : 'medium'} />
             </ModeButton>
           </Tooltip>
           <Tooltip title="Coder Mode">
-            <ModeButton active={activeMode === 'coder'} onClick={() => handleChangeMode('coder')}>
+            <ModeButton isActive={activeMode === 'coder'} onClick={() => handleChangeMode('coder')}>
               <CodeIcon fontSize={isMobile ? 'small' : 'medium'} />
             </ModeButton>
           </Tooltip>
           <Tooltip title="Designer Mode">
-            <ModeButton active={activeMode === 'designer'} onClick={() => handleChangeMode('designer')}>
+            <ModeButton isActive={activeMode === 'designer'} onClick={() => handleChangeMode('designer')}>
               <BrushIcon fontSize={isMobile ? 'small' : 'medium'} />
             </ModeButton>
           </Tooltip>
@@ -793,9 +808,17 @@ const ChatAi = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Send Message">
-            <SendButton onClick={handleSendMessage} disabled={inputText.trim() === ''}>
-              <SendIcon fontSize={isMobile ? 'small' : 'medium'} />
-            </SendButton>
+            {inputText.trim() === '' ? (
+              <span>
+                <SendButton disabled>
+                  <SendIcon fontSize={isMobile ? 'small' : 'medium'} />
+                </SendButton>
+              </span>
+            ) : (
+              <SendButton onClick={handleSendMessage}>
+                <SendIcon fontSize={isMobile ? 'small' : 'medium'} />
+              </SendButton>
+            )}
           </Tooltip>
         </Box>
       </InputArea>
