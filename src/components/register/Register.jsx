@@ -43,7 +43,7 @@ const BannerBox = styled(Box)({
   transition: 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out',
   '&:hover': {
     transform: 'translateY(-5px)',
-    opacity: 0.9,
+    opacity: '0.9',
   },
 });
 
@@ -123,15 +123,23 @@ const StyledButton = styled(Button)({
   },
 });
 
+const ErrorMessage = styled(Typography)({
+  color: '#ff4d4d',
+  fontSize: '0.9rem',
+  textAlign: 'center',
+  marginTop: '8px',
+});
+
 const Register = () => {
   const [isLoginMode, setIsLoginMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     username: '',
-    password: ''
+    password: '',
   });
   const navigate = useNavigate();
 
@@ -140,7 +148,7 @@ const Register = () => {
     const cellCount = 50;
     const container = document.createElement('div');
     container.className = 'mosaic';
-    document.querySelector('#page-container').prepend(container);
+    document.querySelector('#page-container')?.prepend(container);
 
     for (let i = 0; i < cellCount; i++) {
       const cell = document.createElement('div');
@@ -193,31 +201,64 @@ const Register = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+    setError(''); // Clear error on input
+  };
+
+  const validateForm = () => {
+    if (!isLoginMode) {
+      if (!formData.firstName.trim()) return 'First name is required';
+      if (!formData.lastName.trim()) return 'Last name is required';
+    }
+    if (!formData.email.trim()) return 'Email is required';
+    if (!formData.username.trim()) return 'Username is required';
+    if (!formData.password.trim()) return 'Password is required';
+    if (!isLoginMode && formData.password.length < 6) return 'Password must be at least 6 characters';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Invalid email format';
+    return '';
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
+
+    // Validation
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      // Simulate API call for registration
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Save user data
+      const userData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        username: formData.username.trim(),
+      };
+      localStorage.setItem('userData', JSON.stringify(userData));
+      console.log('Saved userData:', userData); // Debugging
 
       if (!isLoginMode) {
-        // After successful registration, switch to login mode
+        // After registration, switch to login mode
         setIsLoginMode(true);
-        // Clear password field only
-        setFormData(prev => ({ ...prev, password: '' }));
+        setFormData((prev) => ({ ...prev, password: '' }));
       } else {
-        // After successful login, navigate to main page
-        navigate('/app/main');
+        // After login, navigate to account
+        navigate('/app/account');
       }
     } catch (error) {
       console.error('Error:', error);
+      setError('Failed to process. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -304,6 +345,7 @@ const Register = () => {
             InputLabelProps={{ style: { color: '#fff' } }}
             InputProps={{ style: { color: '#fff', borderColor: 'rgba(255, 255, 255, 0.2)' } }}
           />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <StyledButton
             type="submit"
             fullWidth
@@ -330,25 +372,15 @@ const Register = () => {
           <ActionLink
             onClick={() => {
               setIsLoginMode(!isLoginMode);
-              // Clear form when switching modes
-              setFormData({
-                firstName: '',
-                lastName: '',
-                email: '',
-                username: '',
-                password: ''
-              });
+              setFormData((prev) => ({ ...prev, password: '' }));
+              setError('');
             }}
             tabIndex="0"
           >
             {isLoginMode ? 'Need an account? Register' : 'Already have an account? Login'}
           </ActionLink>
           {isLoginMode && (
-            <ActionLink
-              component={Link}
-              to="/app/main"
-              tabIndex="0"
-            >
+            <ActionLink component={Link} to="/app/main" tabIndex="0">
               Start Exploring
             </ActionLink>
           )}

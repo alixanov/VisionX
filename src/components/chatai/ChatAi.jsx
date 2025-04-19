@@ -9,14 +9,12 @@ import {
   Avatar,
   Chip,
   Tooltip,
-  Button,
   CircularProgress,
   useMediaQuery,
   useTheme,
-  Fade,
   Menu,
   MenuItem,
-  Divider
+  Divider,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import MicIcon from '@mui/icons-material/Mic';
@@ -31,17 +29,19 @@ import CodeIcon from '@mui/icons-material/Code';
 import BrushIcon from '@mui/icons-material/Brush';
 import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
 import { gsap } from 'gsap';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-// Main container
 const ChatContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: '100vh',
+  height: '95vh', // По умолчанию для десктопа
   width: '100%',
   position: 'relative',
   overflow: 'hidden',
   fontFamily: 'Inter, sans-serif',
   color: '#fff',
+
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -53,10 +53,10 @@ const ChatContainer = styled(Box)(({ theme }) => ({
     opacity: 0.05,
     zIndex: 0,
     pointerEvents: 'none',
-  }
+  },
 }));
 
-// Header component
+
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -70,7 +70,7 @@ const Header = styled(Box)(({ theme }) => ({
   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
   [theme.breakpoints.down('sm')]: {
     padding: '10px 12px',
-  }
+  },
 }));
 
 const Logo = styled(Typography)(({ theme }) => ({
@@ -87,7 +87,7 @@ const Logo = styled(Typography)(({ theme }) => ({
   gap: '8px',
   [theme.breakpoints.down('sm')]: {
     fontSize: '1.2rem',
-  }
+  },
 }));
 
 const StatusIndicator = styled(Box)(({ status, theme }) => ({
@@ -102,12 +102,22 @@ const StatusIndicator = styled(Box)(({ status, theme }) => ({
     width: '10px',
     height: '10px',
     borderRadius: '50%',
-    background: status === 'online' ? '#00F260' :
-      status === 'typing' ? '#0575E6' :
-        status === 'offline' ? '#ff5252' : '#888',
-    boxShadow: status === 'online' ? '0 0 10px #00F260' :
-      status === 'typing' ? '0 0 10px #0575E6' :
-        status === 'offline' ? '0 0 10px #ff5252' : 'none',
+    background:
+      status === 'online'
+        ? '#00F260'
+        : status === 'typing'
+          ? '#0575E6'
+          : status === 'offline'
+            ? '#ff5252'
+            : '#888',
+    boxShadow:
+      status === 'online'
+        ? '0 0 10px #00F260'
+        : status === 'typing'
+          ? '0 0 10px #0575E6'
+          : status === 'offline'
+            ? '0 0 10px #ff5252'
+            : 'none',
   },
   [theme.breakpoints.down('sm')]: {
     padding: '3px 8px',
@@ -115,11 +125,10 @@ const StatusIndicator = styled(Box)(({ status, theme }) => ({
     '& .status-dot': {
       width: '8px',
       height: '8px',
-    }
-  }
+    },
+  },
 }));
 
-// Messages area
 const MessagesArea = styled(Box)(({ theme }) => ({
   flex: 1,
   padding: '20px',
@@ -141,25 +150,28 @@ const MessagesArea = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     padding: '12px',
     gap: '16px',
-  }
+  },
 }));
 
-const MessageBubble = styled(Paper)(({ isUser, isPinned, theme }) => ({
+const MessageBubble = styled(Paper, {
+  shouldForwardProp: (prop) => !['isuser', 'ispinned'].includes(prop),
+})(({ isuser, ispinned, theme }) => ({
   padding: '16px',
   maxWidth: '80%',
   width: 'fit-content',
-  alignSelf: isUser ? 'flex-end' : 'flex-start',
-  background: isUser ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+  alignSelf: isuser ? 'flex-end' : 'flex-start',
+  background: isuser ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.9)',
   backdropFilter: 'blur(10px)',
-  borderRadius: isUser ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
-  boxShadow: isPinned
-    ? `0 4px 20px ${isUser ? 'rgba(0, 242, 96, 0.3)' : 'rgba(161, 0, 255, 0.3)'}, 0 0 0 1px ${isUser ? 'rgba(0, 242, 96, 0.5)' : 'rgba(161, 0, 255, 0.5)'}`
+  borderRadius: isuser ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
+  boxShadow: ispinned
+    ? `0 4px 20px ${isuser ? 'rgba(0, 242, 96, 0.3)' : 'rgba(161, 0, 255, 0.3)'}, 0 0 0 1px ${isuser ? 'rgba(0, 242, 96, 0.5)' : 'rgba(161, 0, 255, 0.5)'
+    }`
     : `0 4px 20px rgba(0, 0, 0, 0.1)`,
-  border: isPinned ? `1px solid ${isUser ? '#00F260' : '#A100FF'}` : '1px solid rgba(0, 0, 0, 0.1)',
+  border: ispinned ? `1px solid ${isuser ? '#00F260' : '#A100FF'}` : '1px solid rgba(0, 0, 0, 0.1)',
   position: 'relative',
   transition: 'all 0.3s ease',
   '&:hover': {
-    boxShadow: `0 6px 24px ${isUser ? 'rgba(0, 242, 96, 0.25)' : 'rgba(161, 0, 255, 0.25)'}`,
+    boxShadow: `0 6px 24px ${isuser ? 'rgba(0, 242, 96, 0.25)' : 'rgba(161, 0, 255, 0.25)'}`,
   },
   '&:hover .message-actions': {
     opacity: 1,
@@ -167,7 +179,7 @@ const MessageBubble = styled(Paper)(({ isUser, isPinned, theme }) => ({
   [theme.breakpoints.down('sm')]: {
     padding: '12px',
     maxWidth: '90%',
-  }
+  },
 }));
 
 const MessageActions = styled(Box)(({ theme }) => ({
@@ -187,7 +199,7 @@ const MessageActions = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     top: '-10px',
     right: '5px',
-  }
+  },
 }));
 
 const ActionButton = styled(IconButton)(({ theme }) => ({
@@ -201,8 +213,8 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
     padding: '2px',
     '& svg': {
       fontSize: '0.9rem',
-    }
-  }
+    },
+  },
 }));
 
 const MessageHeader = styled(Box)(({ theme }) => ({
@@ -213,41 +225,42 @@ const MessageHeader = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     marginBottom: '6px',
     gap: '6px',
-  }
+  },
 }));
 
-const MessageAvatar = styled(Avatar)(({ isAi, theme }) => ({
+const MessageAvatar = styled(Avatar, {
+  shouldForwardProp: (prop) => prop !== 'isai',
+})(({ isai, theme }) => ({
   width: 32,
   height: 32,
-  background: isAi
+  background: isai
     ? 'linear-gradient(135deg, #A100FF, #0575E6)'
     : 'linear-gradient(135deg, #00F260, #0575E6)',
-  boxShadow: isAi
-    ? '0 0 15px rgba(161, 0, 255, 0.5)'
-    : '0 0 15px rgba(0, 242, 96, 0.5)',
+  boxShadow: isai ? '0 0 15px rgba(161, 0, 255, 0.5)' : '0 0 15px rgba(0, 242, 96, 0.5)',
   [theme.breakpoints.down('sm')]: {
     width: 28,
     height: 28,
-  }
+  },
 }));
 
-const MessageName = styled(Typography)(({ isAi, theme }) => ({
+const MessageName = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== 'isai',
+})(({ isai, theme }) => ({
   fontWeight: 600,
   fontSize: '0.9rem',
-  color: isAi ? '#A100FF' : '#00F260',
-  textShadow: isAi
-    ? '0 0 10px rgba(161, 0, 255, 0.5)'
-    : '0 0 10px rgba(0, 242, 96, 0.5)',
+  color: isai ? '#A100FF' : '#00F260',
+  textShadow: isai ? '0 0 10px rgba(161, 0, 255, 0.5)' : '0 0 10px rgba(0, 242, 96, 0.5)',
   [theme.breakpoints.down('sm')]: {
     fontSize: '0.8rem',
-  }
+  },
 }));
+
 const MessageTime = styled(Typography)(({ theme }) => ({
   fontSize: '0.7rem',
-  color: 'rgba(0, 0, 0, 0.6)', // Darker text for better visibility
+  color: 'rgba(0, 0, 0, 0.6)',
   [theme.breakpoints.down('sm')]: {
     fontSize: '0.65rem',
-  }
+  },
 }));
 
 const MessageText = styled(Typography)(({ theme }) => ({
@@ -256,7 +269,7 @@ const MessageText = styled(Typography)(({ theme }) => ({
   wordBreak: 'break-word',
   [theme.breakpoints.down('sm')]: {
     fontSize: '0.85rem',
-  }
+  },
 }));
 
 const MessageFooter = styled(Box)(({ theme }) => ({
@@ -266,7 +279,7 @@ const MessageFooter = styled(Box)(({ theme }) => ({
   marginTop: '8px',
   [theme.breakpoints.down('sm')]: {
     marginTop: '6px',
-  }
+  },
 }));
 
 const MessageChip = styled(Chip)(({ theme }) => ({
@@ -284,10 +297,9 @@ const MessageChip = styled(Chip)(({ theme }) => ({
     '& .MuiChip-label': {
       padding: '0 6px',
     },
-  }
+  },
 }));
 
-// Input area
 const InputArea = styled(Box)(({ theme }) => ({
   padding: '20px',
   background: 'rgba(16, 18, 27, 0.4)',
@@ -302,7 +314,7 @@ const InputArea = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     padding: '12px',
     gap: '8px',
-  }
+  },
 }));
 
 const InputTextField = styled(TextField)(({ theme }) => ({
@@ -335,7 +347,7 @@ const InputTextField = styled(TextField)(({ theme }) => ({
       padding: '8px 12px',
       fontSize: '0.85rem',
     },
-  }
+  },
 }));
 
 const SendButton = styled(IconButton)(({ theme }) => ({
@@ -356,16 +368,18 @@ const SendButton = styled(IconButton)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     width: '40px',
     height: '40px',
-  }
+  },
 }));
 
-const ModeButton = styled(IconButton)(({ active, theme }) => ({
+const ModeButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== 'isActive',
+})(({ isActive, theme }) => ({
   width: '36px',
   height: '36px',
-  background: active ? 'linear-gradient(135deg, #A100FF, #0575E6)' : 'rgba(16, 18, 27, 0.6)',
+  background: isActive ? 'linear-gradient(135deg, #A100FF, #0575E6)' : 'rgba(16, 18, 27, 0.6)',
   color: '#fff',
   borderRadius: '50%',
-  boxShadow: active ? '0 0 15px rgba(161, 0, 255, 0.5)' : 'none',
+  boxShadow: isActive ? '0 0 15px rgba(161, 0, 255, 0.5)' : 'none',
   transition: 'all 0.3s ease',
   '&:hover': {
     background: 'linear-gradient(135deg, #A100FF, #0575E6)',
@@ -374,7 +388,7 @@ const ModeButton = styled(IconButton)(({ active, theme }) => ({
   [theme.breakpoints.down('sm')]: {
     width: '32px',
     height: '32px',
-  }
+  },
 }));
 
 const ModeSelector = styled(Box)(({ theme }) => ({
@@ -390,10 +404,9 @@ const ModeSelector = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     padding: '4px 8px',
     gap: '6px',
-  }
+  },
 }));
 
-// Animated bubbles in background
 const AnimatedBubble = styled(Box)(({ size, color, theme }) => ({
   position: 'absolute',
   width: size,
@@ -405,150 +418,67 @@ const AnimatedBubble = styled(Box)(({ size, color, theme }) => ({
   pointerEvents: 'none',
 }));
 
-// Demo message data
+const ErrorMessage = styled(Typography)(({ theme }) => ({
+  fontSize: '0.9rem',
+  color: '#ff4d4d',
+  textAlign: 'center',
+  margin: '8px 0',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.8rem',
+  },
+}));
+
 const initialMessages = [
   {
     id: 1,
     text: "Welcome to VisionX Assistant! How can I help you today with your projects or ideas?",
     isUser: false,
     timestamp: new Date(Date.now() - 600000).toISOString(),
-    tags: ["Greeting"],
-    isPinned: false
+    tags: ['Greeting'],
+    isPinned: false,
   },
-  {
-    id: 2,
-    text: "I need help designing a modern dashboard UI for my crypto app. Can you suggest some design principles?",
-    isUser: true,
-    timestamp: new Date(Date.now() - 540000).toISOString(),
-    isPinned: false
-  },
-  {
-    id: 3,
-    text: "For a modern crypto dashboard, I recommend:\n\n1. Use dark mode with neon accents for better readability of charts\n2. Implement glass-morphism for cards and containers\n3. Use minimal, high-contrast data visualizations\n4. Add subtle animations for real-time data updates\n5. Include customizable widgets for different user preferences\n\nWould you like me to elaborate on any of these points?",
-    isUser: false,
-    timestamp: new Date(Date.now() - 480000).toISOString(),
-    tags: ["Design", "UI/UX"],
-    isPinned: true
-  }
 ];
 
-// Main component
 const ChatAi = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const messagesEndRef = useRef(null);
+  const messagesAreaRef = useRef(null);
+  const bubbleRefs = useRef([]);
+  const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState(initialMessages);
   const [isTyping, setIsTyping] = useState(false);
   const [activeMode, setActiveMode] = useState('assistant');
   const [anchorEl, setAnchorEl] = useState(null);
+  const [error, setError] = useState('');
   const open = Boolean(anchorEl);
 
-  // Animation references
-  const bubbleRefs = useRef([]);
-  const messagesAreaRef = useRef(null);
+  let userData;
+  try {
+    const storedData = localStorage.getItem('userData');
+    console.log('Stored userData in ChatAi:', storedData);
+    userData = storedData ? JSON.parse(storedData) : {};
+  } catch (err) {
+    console.error('Error parsing userData:', err);
+    userData = {};
+  }
 
-  // Handle menu
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  // Handle input changes
-  const handleInputChange = (e) => {
-    setInputText(e.target.value);
-  };
-
-  // Handle sending message
-  const handleSendMessage = () => {
-    if (inputText.trim() === '') return;
-
-    const newUserMessage = {
-      id: messages.length + 1,
-      text: inputText,
-      isUser: true,
-      timestamp: new Date().toISOString(),
-      isPinned: false
-    };
-
-    setMessages(prev => [...prev, newUserMessage]);
-    setInputText('');
-    setIsTyping(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = {
-        id: messages.length + 2,
-        text: getAIResponse(inputText, activeMode),
-        isUser: false,
-        timestamp: new Date().toISOString(),
-        tags: getRandomTags(),
-        isPinned: false
-      };
-
-      setMessages(prev => [...prev, aiResponse]);
-      setIsTyping(false);
-    }, 1500 + Math.random() * 1500);
-  };
-
-  // Handle enter key press
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  useEffect(() => {
+    if (!userData.email && !userData.username) {
+      console.warn('No user data found, redirecting to /app/register');
+      navigate('/app/register');
     }
-  };
+  }, [navigate]);
 
-  // Handle message actions
-  const handlePin = (id) => {
-    setMessages(prev =>
-      prev.map(msg =>
-        msg.id === id ? { ...msg, isPinned: !msg.isPinned } : msg
-      )
-    );
-  };
-
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  const handleDelete = (id) => {
-    setMessages(prev => prev.filter(msg => msg.id !== id));
-  };
-
-  // Handle mode change
-  const handleChangeMode = (mode) => {
-    setActiveMode(mode);
-  };
-
-  // Handle clear chat
-  const handleClearChat = () => {
-    setMessages([{
-      id: 1,
-      text: `Chat cleared. What can I help you with in ${activeMode} mode?`,
-      isUser: false,
-      timestamp: new Date().toISOString(),
-      tags: ["New Chat"],
-      isPinned: false
-    }]);
-    handleMenuClose();
-  };
-
-  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Animation setup
   useEffect(() => {
-    // Create bubble animations
     if (bubbleRefs.current.length > 0) {
-      bubbleRefs.current.forEach(bubble => {
+      bubbleRefs.current.forEach((bubble) => {
         if (!bubble) return;
-
         gsap.to(bubble, {
           x: `random(-100, 100)`,
           y: `random(-100, 100)`,
@@ -557,50 +487,151 @@ const ChatAi = () => {
           scale: `random(0.8, 1.2)`,
           repeat: -1,
           yoyo: true,
-          ease: "sine.inOut",
+          ease: 'sine.inOut',
         });
       });
     }
   }, []);
 
-  // Helper function for simulated AI responses
-  const getAIResponse = (text, mode) => {
-    const lowerText = text.toLowerCase();
-
-    // Mode-specific responses
-    if (mode === 'assistant') {
-      if (lowerText.includes('hello') || lowerText.includes('hi')) {
-        return "Hello! I'm your VisionX Assistant. How can I help you today?";
-      } else if (lowerText.includes('help')) {
-        return "I'm here to help! You can ask me about AI, design, coding, or any general questions. What do you need assistance with?";
-      }
-      return "I understand your query. As your VisionX Assistant, I can help you explore this topic further. Would you like more specific information about any aspect?";
-    }
-
-    if (mode === 'coder') {
-      return "From a coding perspective, I'd recommend using React with styled-components for this UI. Consider implementing a responsive grid layout with CSS Grid or Flexbox. Would you like me to provide some starter code?";
-    }
-
-    if (mode === 'designer') {
-      return "From a design perspective, consider using a dark theme with accent colors #00F260 and #0575E6. Implement glass-morphism for UI components with subtle shadows and borders. Would you like to see a mockup concept?";
-    }
-
-    if (mode === 'innovator') {
-      return "What if we approach this from a different angle? Consider implementing an AI-driven personalization system that adapts the interface based on user behavior. This could revolutionize how users interact with your platform.";
-    }
-
-    return "I'm analyzing your request. Let me think about the best approach to help you with this.";
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  // Helper function for random tags
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleInputChange = (e) => {
+    setInputText(e.target.value);
+    setError('');
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handlePin = (id) => {
+    setMessages((prev) =>
+      prev.map((msg) => (msg.id === id ? { ...msg, isPinned: !msg.isPinned } : msg))
+    );
+  };
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const handleDelete = (id) => {
+    setMessages((prev) => prev.filter((msg) => msg.id !== id));
+  };
+
+  const handleChangeMode = (mode) => {
+    setActiveMode(mode);
+  };
+
+  const handleClearChat = () => {
+    setMessages([
+      {
+        id: 1,
+        text: `Chat cleared. What can I help you with in ${activeMode} mode?`,
+        isUser: false,
+        timestamp: new Date().toISOString(),
+        tags: ['New Chat'],
+        isPinned: false,
+      },
+    ]);
+    handleMenuClose();
+  };
+
+  const handleSendMessage = async () => {
+    if (inputText.trim() === '') return;
+
+    const newUserMessage = {
+      id: Date.now(), // Используем timestamp для уникального ID
+      text: inputText,
+      isUser: true,
+      timestamp: new Date().toISOString(),
+      isPinned: false,
+    };
+
+    setMessages((prev) => [...prev, newUserMessage]);
+    setInputText('');
+    setIsTyping(true);
+    setError('');
+
+    const systemPrompts = {
+      assistant:
+        'You are a helpful assistant for VisionX, a platform for tech enthusiasts. Provide clear, concise, and friendly answers to general questions, focusing on AI, tech, and innovation.',
+      coder:
+        'You are a coding expert for VisionX. Provide detailed, accurate programming advice, including code snippets when relevant. Focus on modern frameworks like React, Node.js, and best practices.',
+      designer:
+        'You are a UI/UX design expert for VisionX. Offer creative design suggestions, focusing on modern trends like dark mode, glass-morphism, and responsive layouts. Provide actionable advice.',
+      innovator:
+        'You are an innovation consultant for VisionX. Think outside the box and suggest bold, creative ideas to revolutionize tech projects or user experiences.',
+    };
+
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/chat',
+        {
+          message: inputText,
+          mode: activeMode,
+          systemPrompt: systemPrompts[activeMode],
+        },
+        {
+          timeout: 30000,
+          retries: 3,
+          retryDelay: 1000,
+          onRetry: (retryCount) => {
+            console.log(`Повторная попытка ${retryCount} из 3...`);
+          }
+        }
+      );
+
+      const aiResponse = {
+        id: Date.now() + 1, // Уникальный ID для ответа
+        text: response.data.message,
+        isUser: false,
+        timestamp: new Date().toISOString(),
+        tags: getRandomTags(),
+        isPinned: false,
+      };
+
+      setMessages((prev) => [...prev, aiResponse]);
+    } catch (err) {
+      console.error('Ошибка получения ответа AI:', err);
+
+      // Более информативное сообщение об ошибке
+      const errorMessage = err.response?.data?.error ||
+        (err.code === 'ECONNABORTED' ?
+          'Время ожидания ответа истекло. Повторите попытку.' :
+          'Не удалось получить ответ AI. Пожалуйста, попробуйте еще раз.');
+
+      setError(errorMessage);
+
+      // Добавляем сообщение об ошибке в чат
+      setMessages((prev) => [...prev, {
+        id: Date.now() + 1,
+        text: `⚠️ ${errorMessage}`,
+        isUser: false,
+        timestamp: new Date().toISOString(),
+        tags: ['Error'],
+        isPinned: false,
+      }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
   const getRandomTags = () => {
-    const allTags = ["AI", "Design", "Code", "UX/UI", "Innovation", "Tech", "Advice", "Explanation"];
+    const allTags = ['AI', 'Design', 'Code', 'UX/UI', 'Innovation', 'Tech', 'Advice', 'Explanation'];
     const numTags = Math.floor(Math.random() * 2) + 1;
     const shuffled = [...allTags].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, numTags);
   };
 
-  // Format timestamp
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -608,48 +639,40 @@ const ChatAi = () => {
 
   return (
     <ChatContainer>
-      {/* Background animated bubbles */}
       <AnimatedBubble
-        ref={el => bubbleRefs.current[0] = el}
+        ref={(el) => (bubbleRefs.current[0] = el)}
         size="300px"
         color="rgba(0, 242, 96, 0.2)"
         sx={{ top: '10%', right: '5%' }}
       />
       <AnimatedBubble
-        ref={el => bubbleRefs.current[1] = el}
+        ref={(el) => (bubbleRefs.current[1] = el)}
         size="400px"
         color="rgba(161, 0, 255, 0.15)"
         sx={{ bottom: '20%', left: '5%' }}
       />
       <AnimatedBubble
-        ref={el => bubbleRefs.current[2] = el}
+        ref={(el) => (bubbleRefs.current[2] = el)}
         size="250px"
         color="rgba(5, 117, 230, 0.2)"
         sx={{ top: '40%', left: '15%' }}
       />
 
-      {/* Header */}
       <Header>
         <Logo variant="h1">
           <ScienceIcon sx={{ fontSize: 28 }} /> VisionX Assistant
         </Logo>
-
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <StatusIndicator status={isTyping ? 'typing' : 'online'}>
             <Box className="status-dot" />
             {isTyping ? 'Thinking...' : 'Online'}
           </StatusIndicator>
-
           <IconButton
             onClick={handleMenuClick}
-            sx={{
-              color: 'white',
-              '&:hover': { color: '#00F260' }
-            }}
+            sx={{ color: 'white', '&:hover': { color: '#00F260' } }}
           >
             <MoreVertIcon />
           </IconButton>
-
           <Menu
             anchorEl={anchorEl}
             open={open}
@@ -663,7 +686,7 @@ const ChatAi = () => {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
                 minWidth: '180px',
-              }
+              },
             }}
           >
             <MenuItem onClick={handleClearChat} sx={{ fontSize: '0.9rem' }}>
@@ -676,26 +699,27 @@ const ChatAi = () => {
             </MenuItem>
             <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
             <MenuItem onClick={handleMenuClose} sx={{ fontSize: '0.9rem' }}>
-              <Box component="span" sx={{ mr: 1, fontSize: '1.2rem' }}>🌙</Box>
+              <Box component="span" sx={{ mr: 1, fontSize: '1.2rem' }}>
+                🌙
+              </Box>
               Dark Theme
             </MenuItem>
           </Menu>
         </Box>
       </Header>
 
-      {/* Messages area */}
       <MessagesArea ref={messagesAreaRef}>
         {messages.map((message) => (
           <MessageBubble
             key={message.id}
-            isUser={message.isUser}
-            isPinned={message.isPinned}
+            isuser={message.isUser}
+            ispinned={message.isPinned}
             elevation={message.isPinned ? 8 : 3}
           >
             <MessageActions className="message-actions">
-              <Tooltip title={message.isPinned ? "Unpin" : "Pin"}>
+              <Tooltip title={message.isPinned ? 'Unpin' : 'Pin'}>
                 <ActionButton size="small" onClick={() => handlePin(message.id)}>
-                  <PushPinIcon fontSize="small" color={message.isPinned ? "primary" : "inherit"} />
+                  <PushPinIcon fontSize="small" color={message.isPinned ? 'primary' : 'inherit'} />
                 </ActionButton>
               </Tooltip>
               <Tooltip title="Copy">
@@ -709,25 +733,18 @@ const ChatAi = () => {
                 </ActionButton>
               </Tooltip>
             </MessageActions>
-
             <MessageHeader>
-              <MessageAvatar isAi={!message.isUser}>
-                {message.isUser ? 'U' : 'AI'}
+              <MessageAvatar isai={!message.isUser}>
+                {message.isUser ? (userData.firstName ? userData.firstName.charAt(0).toUpperCase() : 'U') : 'AI'}
               </MessageAvatar>
               <Box>
-                <MessageName isAi={!message.isUser}>
-                  {message.isUser ? 'You' : 'VisionX AI'}
+                <MessageName isai={!message.isUser}>
+                  {message.isUser ? (userData.firstName || 'You') : 'VisionX AI'}
                 </MessageName>
-                <MessageTime>
-                  {formatTime(message.timestamp)}
-                </MessageTime>
+                <MessageTime>{formatTime(message.timestamp)}</MessageTime>
               </Box>
             </MessageHeader>
-
-            <MessageText>
-              {message.text}
-            </MessageText>
-
+            <MessageText>{message.text}</MessageText>
             {message.tags && (
               <MessageFooter>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -739,87 +756,69 @@ const ChatAi = () => {
             )}
           </MessageBubble>
         ))}
-
         {isTyping && (
-          <MessageBubble isUser={false}>
+          <MessageBubble isuser={false} ispinned={false}>
             <MessageHeader>
-              <MessageAvatar isAi>
-                AI
-              </MessageAvatar>
+              <MessageAvatar isai>AI</MessageAvatar>
               <Box>
-                <MessageName isAi>
-                  VisionX AI
-                </MessageName>
-                <MessageTime>
-                  {formatTime(new Date().toISOString())}
-                </MessageTime>
+                <MessageName isai>VisionX AI</MessageName>
+                <MessageTime>{formatTime(new Date().toISOString())}</MessageTime>
               </Box>
             </MessageHeader>
-
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <CircularProgress size={16} thickness={5} sx={{ color: '#A100FF' }} />
               <MessageText>Thinking...</MessageText>
             </Box>
           </MessageBubble>
         )}
-
+        {error && <ErrorMessage>{error}</ErrorMessage>}
         <div ref={messagesEndRef} />
       </MessagesArea>
 
-      {/* Input area */}
       <InputArea>
         <ModeSelector>
           <Tooltip title="Assistant Mode">
-            <ModeButton
-              active={activeMode === 'assistant'}
-              onClick={() => handleChangeMode('assistant')}
-            >
+            <ModeButton isActive={activeMode === 'assistant'} onClick={() => handleChangeMode('assistant')}>
               <EmojiObjectsIcon fontSize={isMobile ? 'small' : 'medium'} />
             </ModeButton>
           </Tooltip>
-
           <Tooltip title="Coder Mode">
-            <ModeButton
-              active={activeMode === 'coder'}
-              onClick={() => handleChangeMode('coder')}
-            >
+            <ModeButton isActive={activeMode === 'coder'} onClick={() => handleChangeMode('coder')}>
               <CodeIcon fontSize={isMobile ? 'small' : 'medium'} />
             </ModeButton>
           </Tooltip>
-
           <Tooltip title="Designer Mode">
-            <ModeButton
-              active={activeMode === 'designer'}
-              onClick={() => handleChangeMode('designer')}
-            >
+            <ModeButton isActive={activeMode === 'designer'} onClick={() => handleChangeMode('designer')}>
               <BrushIcon fontSize={isMobile ? 'small' : 'medium'} />
             </ModeButton>
           </Tooltip>
         </ModeSelector>
-
         <InputTextField
-          placeholder={isMobile ? "Message..." : "Ask me anything about AI, design, coding..."}
+          placeholder={isMobile ? 'Message...' : 'Ask me anything about AI, design, coding...'}
           multiline
           maxRows={4}
           value={inputText}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
         />
-
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Tooltip title="Voice Input">
             <IconButton sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
               <MicIcon fontSize={isMobile ? 'small' : 'medium'} />
             </IconButton>
           </Tooltip>
-
           <Tooltip title="Send Message">
-            <SendButton
-              onClick={handleSendMessage}
-              disabled={inputText.trim() === ''}
-            >
-              <SendIcon fontSize={isMobile ? 'small' : 'medium'} />
-            </SendButton>
+            {inputText.trim() === '' ? (
+              <span>
+                <SendButton disabled>
+                  <SendIcon fontSize={isMobile ? 'small' : 'medium'} />
+                </SendButton>
+              </span>
+            ) : (
+              <SendButton onClick={handleSendMessage}>
+                <SendIcon fontSize={isMobile ? 'small' : 'medium'} />
+              </SendButton>
+            )}
           </Tooltip>
         </Box>
       </InputArea>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Main, Register, Account, Layout, ChatAi } from '../components';
+import { Main, Register, Account, Layout, ChatAi, InfoProduct, Shop } from '../components';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // Создаем тему с Orbitron как основным шрифтом
@@ -25,11 +25,16 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Register />} />
         <Route path="/app" element={<Layout />}>
-          <Route path="main" element={<Main />} />
+          <Route path="main" element={<Main />} >
+          
+          </Route>
           <Route path="account" element={<Account />} />
           <Route path="chatai" element={<ChatAi />} />
+        <Route path='shop' element={<Shop />} />
         </Route>
-      </Routes>
+        <Route path="info-product/:id" element={<InfoProduct />} />
+
+         </Routes>
     </ThemeProvider>
   );
 };

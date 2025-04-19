@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import { Box, Grid, Card, CardMedia, CardContent, Typography, Chip, Button } from '@mui/material';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { techNewsData } from '../AiData';
+import { techNewsData } from '../data/AiData';
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
@@ -13,14 +13,18 @@ gsap.registerPlugin(ScrollTrigger);
 const MainContainer = styled(Box)(({ theme }) => ({
   width: '100%',
   color: '#fff',
-  fontFamily: 'Space Grotesk',
+  fontFamily: 'Space Grotesk, sans-serif',
   position: 'relative',
   overflow: 'hidden',
   marginRight: '220px',
-  paddingBottom: '0',
+  paddingBottom: '150px',
   [theme.breakpoints.down('md')]: {
-    marginRight: '0',
-    paddingBottom: '20px',
+    marginRight: 0,
+    paddingBottom: '150px',
+  },
+  [theme.breakpoints.down('sm')]: {
+    paddingBottom: '50px',
+    marginTop:-180,
   },
 }));
 
@@ -38,10 +42,11 @@ const HeroSection = styled(Box)(({ theme }) => ({
   padding: '20px',
   [theme.breakpoints.down('md')]: {
     minHeight: '80vh',
-    padding: '10px',
+    padding: '15px',
   },
   [theme.breakpoints.down('sm')]: {
-    minHeight: '60vh',
+    minHeight: '70vh',
+    padding: '10px',
   },
 }));
 
@@ -124,31 +129,33 @@ const CloudBanner = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     fontSize: '0.8rem',
     padding: '8px',
-    borderRadius: '12px',
-    display: 'none', // Hide on very small screens
+    display: 'none',
   },
 }));
 
 // News section
 const NewsSection = styled(Box)(({ theme }) => ({
   padding: '60px 20px',
-  maxWidth: '1200px',
+  maxWidth: '100%',
   width: '100%',
   margin: '0 auto',
+  marginTop: "-190px",
   [theme.breakpoints.down('lg')]: {
     maxWidth: '900px',
   },
   [theme.breakpoints.down('md')]: {
-    padding: '30px 15px',
-    maxWidth: '100%',
+    padding: '40px 15px',
+    maxWidth: '700px',
   },
   [theme.breakpoints.down('sm')]: {
     padding: '20px 10px',
+    maxWidth: '100%',
   },
 }));
 
 const NewsCard = styled(Card)(({ theme }) => ({
-  width: '550px',
+  width: '100%',
+  maxWidth: '550px',
   background: '#FFFFFF',
   borderRadius: '16px',
   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
@@ -156,21 +163,28 @@ const NewsCard = styled(Card)(({ theme }) => ({
   boxSizing: 'border-box',
   margin: '0 auto',
   transition: 'transform 0.3s ease, border 0.3s ease',
+  cursor: 'pointer',
   '&:hover': {
     transform: 'scale(1.02)',
     border: '2px solid #00F260',
   },
+  [theme.breakpoints.down('lg')]: {
+    maxWidth: '450px',
+  },
   [theme.breakpoints.down('md')]: {
-    maxWidth: '330px',
+    maxWidth: '400px',
+  },
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100%',
   },
 }));
 
 const NewsImage = styled(CardMedia)(({ theme }) => ({
   width: '50%',
-  height: '260px',
+  height: '200px',
   borderRadius: '8px',
   [theme.breakpoints.down('lg')]: {
-    height: '220px',
+    height: '180px',
   },
   [theme.breakpoints.down('md')]: {
     height: '160px',
@@ -196,11 +210,14 @@ const FuturisticSection = styled(Box)(({ theme }) => ({
   padding: '60px 20px',
   background: 'rgba(255, 255, 255, 0.05)',
   position: 'relative',
+  [theme.breakpoints.down('lg')]: {
+    padding: '50px 15px',
+  },
   [theme.breakpoints.down('md')]: {
     padding: '40px 15px',
   },
   [theme.breakpoints.down('sm')]: {
-    padding: '30px 10px',
+    padding: '20px 10px',
   },
 }));
 
@@ -231,13 +248,15 @@ const BannerSection = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   [theme.breakpoints.down('lg')]: {
     maxWidth: '900px',
+    padding: '50px 15px',
   },
   [theme.breakpoints.down('md')]: {
+    maxWidth: '700px',
     padding: '40px 15px',
-    maxWidth: '100%',
   },
   [theme.breakpoints.down('sm')]: {
-    padding: '30px 10px',
+    padding: '20px 10px',
+    maxWidth: '100%',
   },
 }));
 
@@ -261,18 +280,17 @@ const BannerCard = styled(Box)(({ theme }) => ({
     boxShadow: '0 12px 32px rgba(0, 242, 96, 0.4)',
   },
   [theme.breakpoints.down('lg')]: {
-    minWidth: '260px',
+    minWidth: '280px',
     height: '180px',
   },
   [theme.breakpoints.down('md')]: {
-    minWidth: '220px',
+    minWidth: '250px',
     height: '150px',
-    margin: '0 8px',
   },
   [theme.breakpoints.down('sm')]: {
-    minWidth: '80%',
+    minWidth: '100%',
+    margin: '8px 0',
     height: '120px',
-    margin: '8px auto',
   },
 }));
 
@@ -285,11 +303,12 @@ const BannerContainer = styled(Box)(({ theme }) => ({
     display: 'none',
   },
   [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: '16px',
   },
 }));
+
+
 
 const Main = () => {
   useEffect(() => {
@@ -306,8 +325,6 @@ const Main = () => {
 
     // Banner animations
     const banners = gsap.utils.toArray('.banner-card');
-
-    // Only apply horizontal scroll animation on desktop
     if (window.innerWidth > 600) {
       gsap.to(banners, {
         xPercent: -100 * (banners.length - 1),
@@ -362,17 +379,28 @@ const Main = () => {
       ease: 'power2.out',
     });
 
+    // Footer animation
+    gsap.from('.footer-section', {
+      opacity: 0,
+      y: 20,
+      duration: 0.8,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.footer-section',
+        start: 'top 90%',
+        toggleActions: 'play none none none',
+      },
+    });
+
     // Responsive adjustments
     const handleResize = () => {
-      // Update animations based on screen size
       if (window.innerWidth <= 600) {
-        // Stop horizontal scroll animation for banners on mobile
         gsap.killTweensOf(banners);
       }
     };
 
     window.addEventListener('resize', handleResize);
-    handleResize(); // Initial check
+    handleResize();
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -402,70 +430,74 @@ const Main = () => {
           align="center"
           gutterBottom
           sx={{
-            fontFamily: 'Orbitron, sans-serif',
             color: '#00F260',
-            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }
+            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' },
           }}
         >
           Latest Innovations
         </Typography>
-        <Grid container spacing={{ xs: 1, sm: 2 }} wrap="wrap" justifyContent="center">
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} wrap="wrap" justifyContent="center">
           {techNewsData.map((news) => (
             <Grid item xs={12} sm={6} md={6} lg={6} key={news.id}>
-              <NewsCard>
-                <ImageContainer>
-                  <NewsImage image={news.images[0]} alt="News" />
-                  <NewsImage image={news.images[1]} alt="News" />
-                </ImageContainer>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <Chip
-                      label={news.tags[0] || 'Tech'}
-                      sx={{
-                        background: 'linear-gradient(45deg, #00F260, #0575E6)',
-                        color: '#fff',
-                        fontSize: '0.8rem',
-                      }}
-                    />
-                  </Box>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      color: '#000',
-                      fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' }
-                    }}
-                  >
-                    {news.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: 'rgba(0, 0, 0, 0.7)',
-                      fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' }
-                    }}
-                  >
-                    {news.description}
-                  </Typography>
-                  <Box mt={2} display="flex" gap={1} flexWrap="wrap">
-                    {news.tags.map((tag, index) => (
+              <Link to={`/info-product/${news.id}`} style={{ textDecoration: 'none' }}>
+                <NewsCard>
+                  <ImageContainer>
+                    <NewsImage image={news.images[0]} alt={news.title} />
+                    <NewsImage image={news.images[1]} alt={news.title} />
+                  </ImageContainer>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                       <Chip
-                        key={index}
-                        label={tag}
-                        size="small"
+                        label={news.tags[0] || 'Tech'}
                         sx={{
-                          background: 'rgba(0, 242, 96, 0.2)',
-                          color: '#00F260',
-                          border: '1px solid #00F260',
-                          fontSize: { xs: '0.7rem', sm: '0.8rem' }
+                          background: 'linear-gradient(45deg, #00F260, #0575E6)',
+                          color: '#fff',
+                          fontSize: '0.8rem',
                         }}
                       />
-                    ))}
-                  </Box>
-                  <Typography variant="caption" sx={{ color: 'rgba(0, 0, 0, 0.5)', mt: 2 }}>
-                    {new Date(news.date).toLocaleDateString()}
-                  </Typography>
-                </CardContent>
-              </NewsCard>
+                    </Box>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        color: '#000',
+                        fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' },
+                      }}
+                    >
+                      {news.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'rgba(0, 0, 0, 0.7)',
+                        fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
+                      }}
+                    >
+                      {news.description}
+                    </Typography>
+                    <Box mt={2} display="flex" gap={1} flexWrap="wrap">
+                      {news.tags.map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          size="small"
+                          sx={{
+                            background: 'rgba(0, 242, 96, 0.2)',
+                            color: '#00F260',
+                            border: '1px solid #00F260',
+                            fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                          }}
+                        />
+                      ))}
+                    </Box>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'rgba(0, 0, 0, 0.5)', mt: 2, display: 'block' }}
+                    >
+                      {new Date(news.date).toLocaleDateString()}
+                    </Typography>
+                  </CardContent>
+                </NewsCard>
+              </Link>
             </Grid>
           ))}
         </Grid>
@@ -480,27 +512,32 @@ const Main = () => {
           sx={{
             fontFamily: 'Orbitron, sans-serif',
             color: '#A100FF',
-            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }
+            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' },
           }}
         >
           Live in the Rhythm of Innovation
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          {/* SOL course (placeholder) */}
-          <Box sx={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            padding: { xs: '12px', sm: '16px' },
-            borderRadius: '12px'
-          }}>
-            <Typography variant="h6" sx={{
-              color: '#00F260',
-              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' }
-            }}>
+          <Box
+            sx={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              padding: { xs: '12px', sm: '16px' },
+              borderRadius: '12px',
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#00F260',
+                fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
+              }}
+            >
               SOL/USD: $142.35 (+2.3%)
             </Typography>
           </Box>
-          {/* AI innovations */}
-          <Box sx={{ display: 'flex', gap: { xs: 1, sm: 2 }, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <Box
+            sx={{ display: 'flex', gap: { xs: 1, sm: 2 }, flexWrap: 'wrap', justifyContent: 'center' }}
+          >
             {['AI Robotics', 'Smart Homes', 'AR/VR Design'].map((item, index) => (
               <Chip
                 key={index}
@@ -514,25 +551,26 @@ const Main = () => {
               />
             ))}
           </Box>
-          {/* AI avatar */}
           <Box
             className="ai-avatar"
             sx={{ opacity: 0, transform: 'translateX(100px)', textAlign: 'center' }}
           >
-            <Typography variant="h6" sx={{
-              color: '#A100FF',
-              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' }
-            }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#A100FF',
+                fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
+              }}
+            >
               Hello! Ready to create the future?
             </Typography>
           </Box>
         </Box>
-        {/* Avatar bubbles */}
-        {[...Array(3)].map((_, i) => (
+        {[...Array(2)].map((_, i) => (
           <AvatarBubble
             key={i}
             className="avatar-bubble"
-            sx={{ top: `${20 + i * 20}%`, left: `${10 + i * 20}%` }}
+            sx={{ top: `${20 + i * 25}%`, left: `${10 + i * 25}%` }}
           />
         ))}
       </FuturisticSection>
@@ -546,28 +584,45 @@ const Main = () => {
             fontFamily: 'Orbitron, sans-serif',
             color: '#0575E6',
             mb: 4,
-            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }
+            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' },
           }}
         >
           Inspiration Starts Here
         </Typography>
         <BannerContainer>
-          {['Your idea is waiting', 'Be part of innovation', 'Create. Share. Inspire.'].map((text, index) => (
-            <BannerCard key={index} className="banner-card">
-              <Typography
-                variant="h6"
-                sx={{
-                  color: '#fff',
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' }
-                }}
-              >
-                {text}
-              </Typography>
-            </BannerCard>
-          ))}
+          {['Your idea is waiting', 'Be part of innovation', 'Create. Share. Inspire.'].map(
+            (text, index) => (
+              <BannerCard key={index} className="banner-card">
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: '#fff',
+                    fontFamily: 'Space Grotesk, sans-serif',
+                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
+                  }}
+                >
+                  {text}
+                </Typography>
+              </BannerCard>
+            )
+          )}
         </BannerContainer>
       </BannerSection>
+
+      {/* Footer */}
+      {/* <FooterSection className="footer-section">
+        <Typography
+          variant="body2"
+          sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+        >
+          © 2025 VisionX. All rights reserved.
+        </Typography>
+        <Box sx={{ display: 'flex', gap: '16px' }}>
+          <FooterLink>Twitter</FooterLink>
+          <FooterLink>Discord</FooterLink>
+          <FooterLink>Contact: info@visionx.com</FooterLink>
+        </Box>
+      </FooterSection> */}
     </MainContainer>
   );
 };
@@ -588,8 +643,6 @@ styles.innerHTML = `
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
-  
-  /* Mobile responsive additions */
   @media (max-width: 600px) {
     .visionx-logo {
       font-size: 1.5rem;
