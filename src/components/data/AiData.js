@@ -111,4 +111,35 @@ Whether you're a developer or gamer, a good station boosts comfort and creativit
 
 Popular among tech-savvy homeowners, these setups are fully voice-controlled and adapt to mood, schedule, and sunlight. The future of home is comfortable, connected, and deeply aesthetic.`
   },
+  {
+    id: 9,
+    title: "VisionX AI Goes Viral Across Social Media",
+    description: "VisionX is trending across platforms for its futuristic AI-generated visuals and social community features.",
+    images: [
+      "https://i.pinimg.com/736x/92/16/bc/9216bcd74a3d55de1a26021541003489.jpg",
+      "https://ogniwosopot.pl/wp-content/uploads/2024/07/316406419_8328368157235687_8437316741373187827_n.jpg"
+    ],
+    tags: ["AI", "VisionX", "social", "trend", "visuals"],
+    date: "April 20, 2025",
+    content: `VisionX AI, a next-generation visual creation tool, has exploded in popularity across social platforms like TikTok, Instagram, and X. The platform blends powerful generative AI with community features, allowing users to create ultra-realistic, cinematic visuals in seconds.
+
+It’s being widely adopted by content creators, digital artists, and tech influencers for building personal brand aesthetics, sci-fi renders, and immersive storytelling. Users are calling it "the future of social design" — and it's just getting started. Expect integration with AR/VR and live customization tools soon.`
+  },
+{
+    id: 10,
+    title: "Smart Speakers ",
+    description: "From budget-friendly options to high-end sound systems — here’s a list of the smartest speakers dominating 2025.",
+    images: [
+      "https://i.pinimg.com/736x/51/b9/0e/51b90e6ab29fc4721d7713ff298e09ce.jpg",
+      "https://i.pinimg.com/736x/b2/85/f1/b285f12666d5468912835d75adcdbe81.jpg"
+    ],
+    tags: ["gadgets", "smart home", "audio", "speakers"],
+    date: "April 20, 2025",
+    content: `Smart speakers have come a long way. In 2025, they’re not just about playing music or setting timers — they’re personal assistants, home automation hubs, and even mood-setters.
+
+This year’s top 10 list includes a mix of voice-controlled devices like the affordable Yandex Station Mini, powerful Sonos Era 300, Apple HomePod 2, and futuristic-looking designs with AI personalization features. Some models now support emotional tone detection, multilingual translation, and fully customizable voices.
+
+Whether you're building a smart home or just need better sound, these speakers offer great value and style.`
+  }
+
 ];
