@@ -185,7 +185,7 @@ const NewsCard = styled(Card)(({ theme }) => ({
 
 const NewsImage = styled(CardMedia)(({ theme }) => ({
   width: '50%',
-  height: '200px',
+  height: '350px',
   borderRadius: '8px',
   [theme.breakpoints.down('lg')]: {
     height: '180px',
