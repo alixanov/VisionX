@@ -9,6 +9,8 @@ import { techNewsData } from '../data/AiData';
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
 
+
+
 // Main container
 const MainContainer = styled(Box)(({ theme }) => ({
   width: '100%',
