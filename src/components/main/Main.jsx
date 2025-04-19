@@ -18,6 +18,8 @@ const MainContainer = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   marginRight: '220px',
   paddingBottom: '150px',
+  marginTop: -40,
+
   [theme.breakpoints.down('md')]: {
     marginRight: 0,
     paddingBottom: '150px',

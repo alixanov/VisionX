@@ -29,13 +29,15 @@ import CodeIcon from '@mui/icons-material/Code';
 import BrushIcon from '@mui/icons-material/Brush';
 import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
 import { gsap } from 'gsap';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+// OpenAI API key (NOTE: In production, this should NEVER be exposed in client-side code)
+const OPENAI_API_KEY = "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";
 
 const ChatContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: '95vh', // По умолчанию для десктопа
+  height: '95vh',
   width: '100%',
   position: 'relative',
   overflow: 'hidden',
@@ -55,7 +57,6 @@ const ChatContainer = styled(Box)(({ theme }) => ({
     pointerEvents: 'none',
   },
 }));
-
 
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -549,7 +550,7 @@ const ChatAi = () => {
     if (inputText.trim() === '') return;
 
     const newUserMessage = {
-      id: Date.now(), // Используем timestamp для уникального ID
+      id: Date.now(),
       text: inputText,
       isUser: true,
       timestamp: new Date().toISOString(),
@@ -573,26 +574,40 @@ const ChatAi = () => {
     };
 
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/chat',
-        {
-          message: inputText,
-          mode: activeMode,
-          systemPrompt: systemPrompts[activeMode],
+      // Direct call to OpenAI API
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_API_KEY}`
         },
-        {
-          timeout: 30000,
-          retries: 3,
-          retryDelay: 1000,
-          onRetry: (retryCount) => {
-            console.log(`Повторная попытка ${retryCount} из 3...`);
-          }
-        }
-      );
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content: systemPrompts[activeMode]
+            },
+            {
+              role: "user",
+              content: inputText
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 1000
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      const aiResponseText = data.choices[0].message.content;
 
       const aiResponse = {
-        id: Date.now() + 1, // Уникальный ID для ответа
-        text: response.data.message,
+        id: Date.now() + 1,
+        text: aiResponseText,
         isUser: false,
         timestamp: new Date().toISOString(),
         tags: getRandomTags(),
@@ -601,17 +616,10 @@ const ChatAi = () => {
 
       setMessages((prev) => [...prev, aiResponse]);
     } catch (err) {
-      console.error('Ошибка получения ответа AI:', err);
-
-      // Более информативное сообщение об ошибке
-      const errorMessage = err.response?.data?.error ||
-        (err.code === 'ECONNABORTED' ?
-          'Время ожидания ответа истекло. Повторите попытку.' :
-          'Не удалось получить ответ AI. Пожалуйста, попробуйте еще раз.');
-
+      console.error('Error getting AI response:', err);
+      const errorMessage = err.message || 'Failed to get AI response. Please try again.';
       setError(errorMessage);
 
-      // Добавляем сообщение об ошибке в чат
       setMessages((prev) => [...prev, {
         id: Date.now() + 1,
         text: `⚠️ ${errorMessage}`,
