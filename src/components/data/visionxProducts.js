@@ -2,7 +2,7 @@ export const visionxProducts = [
   {
     id: 1,
     name: "VisionX VR Headset",
-    description: "Погрузись в метавселенную с ультрашироким полем зрения и поддержкой жестового управления.",
+    description: "Immerse yourself in the metaverse with an ultra-wide field of view and gesture control support.",
     image: "https://i.pinimg.com/736x/5a/15/40/5a1540fcce47084c4f27f149421117c9.jpg",
     priceUSD: 399.99,
     tags: ["VR", "Immersive", "Gaming", "Future"],
@@ -11,7 +11,7 @@ export const visionxProducts = [
   {
     id: 2,
     name: "AirPods Neo",
-    description: "Новейшие беспроводные наушники с пространственным звуком и интеллектуальной адаптацией.",
+    description: "The latest wireless earbuds with spatial audio and intelligent adaptation.",
     image: "https://i.pinimg.com/736x/87/1f/f7/871ff7829ba2991dedabdd9ae6a76603.jpg",
     priceUSD: 249.99,
     tags: ["Audio", "Apple", "Wireless", "Smart"],
@@ -20,7 +20,7 @@ export const visionxProducts = [
   {
     id: 3,
     name: "iPhone 16 Pro Vision Edition",
-    description: "Флагманский смартфон с нейронным процессором, 3D-интерфейсом и встроенным AI-ассистентом.",
+    description: "Flagship smartphone with a neural processor, 3D interface, and built-in AI assistant.",
     image: "https://i.pinimg.com/736x/a0/c1/45/a0c1451ef3f083e0b55da19285a2b4d5.jpg",
     priceUSD: 1299.99,
     tags: ["Apple", "Smartphone", "VisionOS", "Premium"],
@@ -29,7 +29,7 @@ export const visionxProducts = [
   {
     id: 4,
     name: "SmartPen X",
-    description: "Умная ручка, которая распознаёт твой почерк, переводит текст в цифру и синхронизируется с облаком.",
+    description: "A smart pen that recognizes your handwriting, converts text to digital, and syncs with the cloud.",
     image: "https://i.pinimg.com/736x/30/b1/fe/30b1fefcfcbd7e261d42a33b57669071.jpg",
     priceUSD: 89.00,
     tags: ["Smart", "Writing", "Productivity"],
@@ -38,7 +38,7 @@ export const visionxProducts = [
   {
     id: 5,
     name: "SonicSphere AI Speaker",
-    description: "Голосовой помощник нового поколения с объемным звуком и адаптивным освещением.",
+    description: "Next-generation voice assistant with immersive sound and adaptive lighting.",
     image: "https://i.pinimg.com/736x/92/f7/c5/92f7c54a6adc2a2382cfd2d156265b59.jpg",
     priceUSD: 159.99,
     tags: ["Smart Home", "Speaker", "Voice Assistant"],
@@ -47,7 +47,7 @@ export const visionxProducts = [
   {
     id: 6,
     name: "HomeBot Mini",
-    description: "Компактный умный робот, который помогает по дому, отвечает на вопросы и даже развлекает детей.",
+    description: "A compact smart robot that helps around the house, answers questions, and even entertains kids.",
     image: "https://i.pinimg.com/736x/57/85/fa/5785fa53653bc0574ece82f059006d91.jpg",
     priceUSD: 499.99,
     tags: ["AI", "Robot", "Home", "IoT"],

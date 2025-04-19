@@ -168,7 +168,7 @@ const ProductCard = styled(Card)(({ theme }) => ({
 
 const ProductImage = styled('img')(({ theme }) => ({
   width: '100%',
-  height: '200px',
+  height: '400px',
   objectFit: 'cover',
   borderRadius: '12px 12px 0 0',
   [theme.breakpoints.down('sm')]: {
@@ -368,7 +368,7 @@ const SuccessMessage = styled(Typography)(({ theme }) => ({
   },
 }));
 
-// CSS для мозаики, анимаций и конфетти
+// CSS for mosaic, animations, and confetti
 const styles = document.createElement('style');
 styles.innerHTML = `
   .mosaic {
@@ -444,7 +444,7 @@ const Shop = () => {
     }
   }, []);
 
-  // Мозаика фона
+  // Background mosaic
   useEffect(() => {
     const cells = [];
     const cellCount = isMobile ? 15 : 30;
@@ -516,7 +516,7 @@ const Shop = () => {
     };
   }, [isMobile]);
 
-  // Анимация карточек
+  // Card animations
   useEffect(() => {
     gsap.fromTo(
       cardRefs.current,
@@ -531,7 +531,7 @@ const Shop = () => {
     );
   }, []);
 
-  // Анимация открытия/закрытия overlay
+  // Overlay open/close animation
   useEffect(() => {
     if (checkoutOpen) {
       gsap.fromTo(
@@ -542,7 +542,7 @@ const Shop = () => {
     }
   }, [checkoutOpen]);
 
-  // Конфетти при успешной оплате
+  // Confetti on successful payment
   useEffect(() => {
     if (paymentStatus === 'success') {
       const confettiCount = 50;
@@ -609,7 +609,7 @@ const Shop = () => {
     setPaymentStatus('loading');
     setError('');
 
-    // Анимация "взрыва" кнопки
+    // Button "explosion" animation
     gsap.to(payButtonRef, {
       scale: 1.2,
       opacity: 0,
@@ -651,7 +651,7 @@ const Shop = () => {
             </IconButton>
           </Box>
           <Typography sx={{ color: 'rgba(255, 255, 255, 0.8)', mb: 2 }}>
-            Вы почти у цели. Устройства из будущего ждут вас! Подтвердите заказ и получите доступ к самой передовой технологии уже сегодня.
+            You're almost there. Devices from the future await! Confirm your order and gain access to cutting-edge technology today.
           </Typography>
 
           {cart.length === 0 && paymentStatus !== 'success' && (
@@ -744,17 +744,17 @@ const Shop = () => {
       <ContentWrapper>
         <ShopTitle variant="h1">🛒 VisionX Tech Shop</ShopTitle>
         <ShopSubtitle>
-          Где технологии становятся личными
+          Where technology becomes personal
           <br />
-          Добро пожаловать в магазин VisionX — здесь ты можешь приобрести не просто гаджеты, а кусочек будущего.
+          Welcome to the VisionX store — here you can purchase not just gadgets, but a piece of the future.
           <br />
-          Каждое устройство в каталоге отобрано за инновации, дизайн и потенциал изменить твой день.
+          Every device in the catalog is selected for its innovation, design, and potential to transform your day.
         </ShopSubtitle>
         <FeaturesList>
-          <Typography>💡 Прямые поставки от брендов нового поколения</Typography>
-          <Typography>🧠 Устройства с AI, VR и IoT интеграцией</Typography>
-          <Typography>🌌 Уникальный дизайн в стиле VisionX Universe</Typography>
-          <Typography>🔐 Безопасная оплата и быстрая доставка</Typography>
+          <Typography>💡 Direct supplies from next-generation brands</Typography>
+          <Typography>🧠 Devices with AI, VR, and IoT integration</Typography>
+          <Typography>🌌 Unique design in the VisionX Universe style</Typography>
+          <Typography>🔐 Secure payment and fast delivery</Typography>
         </FeaturesList>
         <ProductGrid>
           {visionxProducts.map((product, index) => (

@@ -32,16 +32,16 @@ import { gsap } from 'gsap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// Styled Components
 const ChatContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: '95vh', // По умолчанию для десктопа
+  height: '95vh',
   width: '100%',
   position: 'relative',
   overflow: 'hidden',
   fontFamily: 'Inter, sans-serif',
   color: '#fff',
-
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -55,7 +55,6 @@ const ChatContainer = styled(Box)(({ theme }) => ({
     pointerEvents: 'none',
   },
 }));
-
 
 const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -428,15 +427,37 @@ const ErrorMessage = styled(Typography)(({ theme }) => ({
   },
 }));
 
+// Dynamic welcome message based on time of day
+const getWelcomeMessage = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) {
+    return "Good morning! Ready to explore AI, coding, or design?";
+  } else if (hour < 18) {
+    return "Hey there! Let’s dive into your tech ideas this afternoon!";
+  } else {
+    return "Evening vibes! What’s your next big project?";
+  }
+};
+
 const initialMessages = [
   {
     id: 1,
-    text: "Welcome to VisionX Assistant! How can I help you today with your projects or ideas?",
+    text: getWelcomeMessage(),
     isUser: false,
     timestamp: new Date(Date.now() - 600000).toISOString(),
     tags: ['Greeting'],
     isPinned: false,
   },
+];
+
+// Randomized test mode messages
+const testModeMessages = [
+  "We're in test mode right now. Please try again in about 5 minutes!",
+  "Come back in 5 minutes, we're tweaking things!",
+  "Test mode active! Give us a few minutes to get back online.",
+  "Oops, we're in a test phase. Try again shortly!",
+  "Hang tight! We're testing some cool stuff, back in 5!",
+  "Test mode on! Check back in a few minutes for the action."
 ];
 
 const ChatAi = () => {
@@ -445,7 +466,6 @@ const ChatAi = () => {
   const messagesEndRef = useRef(null);
   const messagesAreaRef = useRef(null);
   const bubbleRefs = useRef([]);
-  const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState(initialMessages);
   const [isTyping, setIsTyping] = useState(false);
@@ -454,22 +474,18 @@ const ChatAi = () => {
   const [error, setError] = useState('');
   const open = Boolean(anchorEl);
 
-  let userData;
-  try {
-    const storedData = localStorage.getItem('userData');
-    console.log('Stored userData in ChatAi:', storedData);
-    userData = storedData ? JSON.parse(storedData) : {};
-  } catch (err) {
-    console.error('Error parsing userData:', err);
-    userData = {};
-  }
-
-  useEffect(() => {
-    if (!userData.email && !userData.username) {
-      console.warn('No user data found, redirecting to /app/register');
-      navigate('/app/register');
+  // Get user data from localStorage or use default
+  const getUserData = () => {
+    try {
+      const storedData = localStorage.getItem('userData');
+      return storedData ? JSON.parse(storedData) : { firstName: 'You' };
+    } catch (err) {
+      console.error('Error parsing userData:', err);
+      return { firstName: 'You' };
     }
-  }, [navigate]);
+  };
+
+  const userData = getUserData();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -535,7 +551,7 @@ const ChatAi = () => {
     setMessages([
       {
         id: 1,
-        text: `Chat cleared. What can I help you with in ${activeMode} mode?`,
+        text: `Chat cleared. How can I assist you in ${activeMode} mode?`,
         isUser: false,
         timestamp: new Date().toISOString(),
         tags: ['New Chat'],
@@ -549,7 +565,7 @@ const ChatAi = () => {
     if (inputText.trim() === '') return;
 
     const newUserMessage = {
-      id: Date.now(), // Используем timestamp для уникального ID
+      id: Date.now(),
       text: inputText,
       isUser: true,
       timestamp: new Date().toISOString(),
@@ -585,13 +601,13 @@ const ChatAi = () => {
           retries: 3,
           retryDelay: 1000,
           onRetry: (retryCount) => {
-            console.log(`Повторная попытка ${retryCount} из 3...`);
-          }
+            console.log(`Retry attempt ${retryCount} of 3...`);
+          },
         }
       );
 
       const aiResponse = {
-        id: Date.now() + 1, // Уникальный ID для ответа
+        id: Date.now() + 1,
         text: response.data.message,
         isUser: false,
         timestamp: new Date().toISOString(),
@@ -601,25 +617,24 @@ const ChatAi = () => {
 
       setMessages((prev) => [...prev, aiResponse]);
     } catch (err) {
-      console.error('Ошибка получения ответа AI:', err);
+      console.error('Error fetching AI response:', err);
 
-      // Более информативное сообщение об ошибке
-      const errorMessage = err.response?.data?.error ||
-        (err.code === 'ECONNABORTED' ?
-          'Время ожидания ответа истекло. Повторите попытку.' :
-          'Не удалось получить ответ AI. Пожалуйста, попробуйте еще раз.');
+      // Select a random test mode message
+      const randomMessage = testModeMessages[Math.floor(Math.random() * testModeMessages.length)];
 
-      setError(errorMessage);
+      setError(randomMessage);
 
-      // Добавляем сообщение об ошибке в чат
-      setMessages((prev) => [...prev, {
-        id: Date.now() + 1,
-        text: `⚠️ ${errorMessage}`,
-        isUser: false,
-        timestamp: new Date().toISOString(),
-        tags: ['Error'],
-        isPinned: false,
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          text: randomMessage,
+          isUser: false,
+          timestamp: new Date().toISOString(),
+          tags: ['Test Mode'],
+          isPinned: false,
+        },
+      ]);
     } finally {
       setIsTyping(false);
     }
@@ -670,6 +685,7 @@ const ChatAi = () => {
           <IconButton
             onClick={handleMenuClick}
             sx={{ color: 'white', '&:hover': { color: '#00F260' } }}
+            aria-label="More options"
           >
             <MoreVertIcon />
           </IconButton>
@@ -717,17 +733,17 @@ const ChatAi = () => {
             elevation={message.isPinned ? 8 : 3}
           >
             <MessageActions className="message-actions">
-              <Tooltip title={message.isPinned ? 'Unpin' : 'Pin'}>
+              <Tooltip title={message.isPinned ? 'Unpin Message' : 'Pin Message'}>
                 <ActionButton size="small" onClick={() => handlePin(message.id)}>
                   <PushPinIcon fontSize="small" color={message.isPinned ? 'primary' : 'inherit'} />
                 </ActionButton>
               </Tooltip>
-              <Tooltip title="Copy">
+              <Tooltip title="Copy Message">
                 <ActionButton size="small" onClick={() => handleCopy(message.text)}>
                   <ContentCopyIcon fontSize="small" />
                 </ActionButton>
               </Tooltip>
-              <Tooltip title="Delete">
+              <Tooltip title="Delete Message">
                 <ActionButton size="small" onClick={() => handleDelete(message.id)}>
                   <DeleteOutlineIcon fontSize="small" />
                 </ActionButton>
@@ -735,7 +751,7 @@ const ChatAi = () => {
             </MessageActions>
             <MessageHeader>
               <MessageAvatar isai={!message.isUser}>
-                {message.isUser ? (userData.firstName ? userData.firstName.charAt(0).toUpperCase() : 'U') : 'AI'}
+                {message.isUser ? (userData.firstName ? userData.firstName.charAt(0).toUpperCase() : 'Y') : 'AI'}
               </MessageAvatar>
               <Box>
                 <MessageName isai={!message.isUser}>
@@ -792,30 +808,36 @@ const ChatAi = () => {
               <BrushIcon fontSize={isMobile ? 'small' : 'medium'} />
             </ModeButton>
           </Tooltip>
+          <Tooltip title="Innovator Mode">
+            <ModeButton isActive={activeMode === 'innovator'} onClick={() => handleChangeMode('innovator')}>
+              <ScienceIcon fontSize={isMobile ? 'small' : 'medium'} />
+            </ModeButton>
+          </Tooltip>
         </ModeSelector>
         <InputTextField
-          placeholder={isMobile ? 'Message...' : 'Ask me anything about AI, design, coding...'}
+          placeholder={isMobile ? 'Type a message...' : 'Ask about AI, design, coding, or innovation...'}
           multiline
           maxRows={4}
           value={inputText}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
+          aria-label="Message input"
         />
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Tooltip title="Voice Input">
-            <IconButton sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            <IconButton sx={{ color: 'rgba(255, 255, 255, 0.7)' }} aria-label="Voice input">
               <MicIcon fontSize={isMobile ? 'small' : 'medium'} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Send Message">
             {inputText.trim() === '' ? (
               <span>
-                <SendButton disabled>
+                <SendButton disabled aria-label="Send message (disabled)">
                   <SendIcon fontSize={isMobile ? 'small' : 'medium'} />
                 </SendButton>
               </span>
             ) : (
-              <SendButton onClick={handleSendMessage}>
+              <SendButton onClick={handleSendMessage} aria-label="Send message">
                 <SendIcon fontSize={isMobile ? 'small' : 'medium'} />
               </SendButton>
             )}
@@ -825,9 +847,5 @@ const ChatAi = () => {
     </ChatContainer>
   );
 };
-
-
-
-
 
 export default ChatAi;

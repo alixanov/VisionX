@@ -25,16 +25,15 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Register />} />
         <Route path="/app" element={<Layout />}>
-          <Route path="main" element={<Main />} >
-          
-          </Route>
+          <Route path="main" element={<Main />} />
           <Route path="account" element={<Account />} />
           <Route path="chatai" element={<ChatAi />} />
-        <Route path='shop' element={<Shop />} />
+          <Route path="shop" element={<Shop />} />
         </Route>
         <Route path="info-product/:id" element={<InfoProduct />} />
-
-         </Routes>
+        {/* Прямой доступ к чату без авторизации */}
+        <Route path="/chatai" element={<ChatAi />} />
+      </Routes>
     </ThemeProvider>
   );
 };

@@ -298,7 +298,7 @@ const Sidebar = () => {
               aria-label="Go to chat page"
             >
               <ReviewsIcon fontSize="inherit" />
-              <span>Chat</span>
+              <span>VisionX-Chat</span>
             </SidebarButton>
 
             <SidebarButton
