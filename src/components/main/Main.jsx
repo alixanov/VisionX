@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { Box, Grid, Card, CardMedia, CardContent, Typography, Chip, Button } from '@mui/material';
-import { gsap } from 'gsap';
+import { gsap, wrap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Tilt from 'react-parallax-tilt';
 import { techNewsData } from '../data/AiData';
+import { Lightbulb, Group, Rocket } from '@mui/icons-material';
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
-
-
 
 // Main container
 const MainContainer = styled(Box)(({ theme }) => ({
@@ -21,14 +21,13 @@ const MainContainer = styled(Box)(({ theme }) => ({
   marginRight: '220px',
   paddingBottom: '150px',
   marginTop: -40,
-
   [theme.breakpoints.down('md')]: {
     marginRight: 0,
     paddingBottom: '150px',
   },
   [theme.breakpoints.down('sm')]: {
     paddingBottom: '50px',
-    marginTop:-180,
+    marginTop: -180,
   },
 }));
 
@@ -139,11 +138,12 @@ const CloudBanner = styled(Box)(({ theme }) => ({
 
 // News section
 const NewsSection = styled(Box)(({ theme }) => ({
-  padding: '60px 20px',
+  padding: '60px 10px',
   maxWidth: '100%',
   width: '100%',
   margin: '0 auto',
   marginTop: "-190px",
+  gap:30,
   [theme.breakpoints.down('lg')]: {
     maxWidth: '900px',
   },
@@ -244,75 +244,197 @@ const AvatarBubble = styled(Box)(({ theme }) => ({
   },
 }));
 
-// Banner section
+// Updated Banner section
 const BannerSection = styled(Box)(({ theme }) => ({
-  padding: '60px 20px',
-  maxWidth: '1200px',
+  padding: '100px 20px',
+  maxWidth: '100%',
   margin: '0 auto',
+  position: 'relative',
   overflow: 'hidden',
+  borderRadius: '32px',
+  zIndex: 1,
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -1,
+    animation: 'pulse 8s infinite ease-in-out',
+  },
+  '@keyframes pulse': {
+    '0%, 100%': { transform: 'scale(1)', opacity: 0.2 },
+    '50%': { transform: 'scale(1.2)', opacity: 0.4 },
+  },
   [theme.breakpoints.down('lg')]: {
-    maxWidth: '900px',
-    padding: '50px 15px',
+    maxWidth: '1000px',
+    padding: '80px 15px',
   },
   [theme.breakpoints.down('md')]: {
     maxWidth: '700px',
-    padding: '40px 15px',
+    padding: '60px 15px',
   },
   [theme.breakpoints.down('sm')]: {
-    padding: '20px 10px',
+    padding: '40px 10px',
     maxWidth: '100%',
   },
 }));
 
-const BannerCard = styled(Box)(({ theme }) => ({
-  minWidth: '300px',
-  height: '200px',
-  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-  borderRadius: '16px',
-  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(0, 242, 96, 0.2)',
+const BannerGrid = styled(Grid)(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
   justifyContent: 'center',
-  textAlign: 'center',
-  margin: '0 16px',
-  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-  position: 'relative',
-  zIndex: 2,
-  willChange: 'transform',
-  '&:hover': {
-    transform: 'translateY(-10px)',
-    boxShadow: '0 12px 32px rgba(0, 242, 96, 0.4)',
-  },
-  [theme.breakpoints.down('lg')]: {
-    minWidth: '280px',
-    height: '180px',
-  },
-  [theme.breakpoints.down('md')]: {
-    minWidth: '250px',
-    height: '150px',
-  },
   [theme.breakpoints.down('sm')]: {
-    minWidth: '100%',
-    margin: '8px 0',
-    height: '120px',
-  },
-}));
-
-const BannerContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  overflowX: 'auto',
-  padding: '16px 0',
-  scrollSnapType: 'x mandatory',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
   },
 }));
 
+const BannerCard = styled(Box)(({ theme }) => ({
+  background: 'linear-gradient(45deg, rgba(0, 242, 96, 0.15), rgba(5, 117, 230, 0.15), rgba(161, 0, 255, 0.15))',
+  backdropFilter: 'blur(12px)',
+  borderRadius: '20px',
+  border: '1px solid rgba(255, 255, 255, 0.3)',
+  padding: '32px',
+  textAlign: 'center',
+  transition: 'transform 0.4s ease, box-shadow 0.4s ease, border 0.4s ease',
+  opacity: 0,
+  transform: 'translateY(50px) scale(0.95)',
+  minHeight: '360px',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+  position: 'relative',
+  overflow: 'hidden',
+  animation: 'gradientFlow 10s infinite linear',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'linear-gradient(45deg, #00F260, #0575E6, #A100FF, #00F260)',
+    opacity: 0.1,
+    zIndex: -1,
+    animation: 'gradientShift 15s infinite linear',
+  },
+  '&:hover': {
+    transform: 'translateY(-15px) scale(1.05)',
+    boxShadow: '0 12px 32px rgba(0, 242, 96, 0.5)',
+    border: '1px solid #00F260',
+  },
+  '@keyframes gradientFlow': {
+    '0%': { backgroundPosition: '0% 50%' },
+    '100%': { backgroundPosition: '400% 50%' },
+  },
+  '@keyframes gradientShift': {
+    '0%': { backgroundPosition: '0% 50%' },
+    '50%': { backgroundPosition: '100% 50%' },
+    '100%': { backgroundPosition: '0% 50%' },
+  },
+  [theme.breakpoints.down('lg')]: {
+    minHeight: '320px',
+    padding: '24px',
+  },
+  [theme.breakpoints.down('md')]: {
+    minHeight: '280px',
+    padding: '20px',
+  },
+  [theme.breakpoints.down('sm')]: {
+    minHeight: '240px',
+    marginBottom: '20px',
+  },
+}));
 
+const BannerIcon = styled(Box)(({ theme }) => ({
+  fontSize: '3rem',
+  color: '#00F260',
+  marginBottom: '16px',
+  filter: 'drop-shadow(0 0 10px rgba(0, 242, 96, 0.5))',
+  [theme.breakpoints.down('md')]: {
+    fontSize: '2.5rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '2rem',
+  },
+}));
+
+const BannerTitle = styled(Typography)(({ theme }) => ({
+  fontFamily: 'Orbitron, sans-serif',
+  fontSize: '2rem',
+  background: 'linear-gradient(45deg, #00F260, #A100FF)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  marginBottom: '12px',
+  textShadow: '0 0 10px rgba(0, 242, 96, 0.7)',
+  [theme.breakpoints.down('md')]: {
+    fontSize: '1.5rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '1.2rem',
+  },
+}));
+
+const BannerSubtitle = styled(Typography)(({ theme }) => ({
+  fontSize: '1.1rem',
+  color: 'rgba(255, 255, 255, 0.8)',
+  marginBottom: '20px',
+  [theme.breakpoints.down('md')]: {
+    fontSize: '1rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.9rem',
+  },
+}));
+
+const BannerButton = styled(Button)(({ theme }) => ({
+  background: 'linear-gradient(45deg, #00F260, #0575E6, #A100FF)',
+  color: '#fff',
+  padding: '10px 28px',
+  fontSize: '1rem',
+  borderRadius: '10px',
+  textTransform: 'none',
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  animation: 'pulseButton 2s infinite ease-in-out',
+  '&:hover': {
+    transform: 'scale(1.1)',
+    boxShadow: '0 0 20px rgba(0, 242, 96, 0.6)',
+  },
+  '@keyframes pulseButton': {
+    '0%, 100%': { transform: 'scale(1)' },
+    '50%': { transform: 'scale(1.05)' },
+  },
+  [theme.breakpoints.down('md')]: {
+    padding: '8px 24px',
+    fontSize: '0.9rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    padding: '6px 20px',
+    fontSize: '0.8rem',
+  },
+}));
+
+const Particle = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  width: '4px',
+  height: '4px',
+  background: '#00F260',
+  borderRadius: '50%',
+  opacity: 0.5,
+  animation: 'floatParticle 5s infinite linear',
+  zIndex: 0,
+  '@keyframes floatParticle': {
+    '0%': { transform: 'translateY(0) scale(1)', opacity: 0.5 },
+    '50%': { opacity: 0.8 },
+    '100%': { transform: 'translateY(-100vh) scale(0.5)', opacity: 0 },
+  },
+  [theme.breakpoints.down('sm')]: {
+    width: '3px',
+    height: '3px',
+  },
+}));
 
 const Main = () => {
   useEffect(() => {
@@ -328,30 +450,18 @@ const Main = () => {
     });
 
     // Banner animations
-    const banners = gsap.utils.toArray('.banner-card');
-    if (window.innerWidth > 600) {
-      gsap.to(banners, {
-        xPercent: -100 * (banners.length - 1),
-        ease: 'none',
-        duration: 12,
-        repeat: -1,
-        modifiers: {
-          xPercent: gsap.utils.wrap(-100 * (banners.length - 1), 0),
-        },
-      });
-    }
-
     gsap.to('.banner-card', {
       scrollTrigger: {
         trigger: '.banner-section',
-        start: 'top 85%',
+        start: 'top 80%',
         toggleActions: 'play none none none',
       },
       opacity: 1,
       y: 0,
-      duration: 0.5,
-      stagger: 0.15,
-      ease: 'power2.out',
+      scale: 1,
+      duration: 0.6,
+      stagger: 0.2,
+      ease: 'bounce.out',
     });
 
     // Avatar bubble animations
@@ -396,20 +506,32 @@ const Main = () => {
       },
     });
 
-    // Responsive adjustments
-    const handleResize = () => {
-      if (window.innerWidth <= 600) {
-        gsap.killTweensOf(banners);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    handleResize();
-
     return () => {
-      window.removeEventListener('resize', handleResize);
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
+
+  // Data for banner cards
+  const bannerData = [
+    {
+      icon: <Lightbulb />,
+      title: 'Ignite Creativity',
+      subtitle: 'Unleash your ideas with cutting-edge tools and a vibrant community.',
+      action: 'Start Creating',
+    },
+    {
+      icon: <Group />,
+      title: 'Collaborate & Innovate',
+      subtitle: 'Join forces with innovators to build the future together.',
+      action: 'Join the Team',
+    },
+    {
+      icon: <Rocket />,
+      title: 'Launch Your Vision',
+      subtitle: 'Transform your concepts into reality with VisionX.',
+      action: 'Launch Now',
+    },
+  ];
 
   return (
     <MainContainer id="main-container">
@@ -419,9 +541,7 @@ const Main = () => {
         <HeroSubtitle variant="h5">
           Explore the technologies of the future. Connect with the VisionX community.
         </HeroSubtitle>
-        <JoinButton component={Link} to="/">
-          Join Now
-        </JoinButton>
+        <JoinButton component={Link} to="/">Join Now</JoinButton>
         <CloudBanner className="cloud-1" sx={{ top: '20%', left: '10%' }}>
           Welcome to the metaverse
         </CloudBanner>
@@ -579,54 +699,51 @@ const Main = () => {
         ))}
       </FuturisticSection>
 
-      {/* Banner section */}
+      {/* Enhanced Banner section */}
       <BannerSection className="banner-section">
         <Typography
           variant="h3"
           align="center"
           sx={{
             fontFamily: 'Orbitron, sans-serif',
-            color: '#0575E6',
-            mb: 4,
-            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' },
+            background: 'linear-gradient(45deg, #00F260, #A100FF)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            mb: 6,
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            textShadow: '0 0 15px rgba(0, 242, 96, 0.7)',
           }}
         >
-          Inspiration Starts Here
+          Unleash Your Future
         </Typography>
-        <BannerContainer>
-          {['Your idea is waiting', 'Be part of innovation', 'Create. Share. Inspire.'].map(
-            (text, index) => (
-              <BannerCard key={index} className="banner-card">
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: '#fff',
-                    fontFamily: 'Space Grotesk, sans-serif',
-                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
-                  }}
-                >
-                  {text}
-                </Typography>
-              </BannerCard>
-            )
-          )}
-        </BannerContainer>
+        <BannerGrid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+          {bannerData.map((banner, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Tilt tiltMaxAngleX={15} tiltMaxAngleY={15} glareEnable={true} glareMaxOpacity={0.3}>
+                <BannerCard className="banner-card">
+                  <BannerIcon>{banner.icon}</BannerIcon>
+                  <Box>
+                    <BannerTitle>{banner.title}</BannerTitle>
+                    <BannerSubtitle>{banner.subtitle}</BannerSubtitle>
+                  </Box>
+                  <BannerButton component={Link} to="/">{banner.action}</BannerButton>
+                </BannerCard>
+              </Tilt>
+            </Grid>
+          ))}
+        </BannerGrid>
+        {/* Particle effects */}
+        {[...Array(20)].map((_, i) => (
+          <Particle
+            key={i}
+            sx={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+            }}
+          />
+        ))}
       </BannerSection>
-
-      {/* Footer */}
-      {/* <FooterSection className="footer-section">
-        <Typography
-          variant="body2"
-          sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
-        >
-          © 2025 VisionX. All rights reserved.
-        </Typography>
-        <Box sx={{ display: 'flex', gap: '16px' }}>
-          <FooterLink>Twitter</FooterLink>
-          <FooterLink>Discord</FooterLink>
-          <FooterLink>Contact: info@visionx.com</FooterLink>
-        </Box>
-      </FooterSection> */}
     </MainContainer>
   );
 };
